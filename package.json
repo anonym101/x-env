@@ -1,0 +1,26 @@
+{
+  "name": "x-env",
+  "version": "1.0.0",
+  "description": "Project environment manager",
+  "main": "./libs/XEnv.js",
+  "type": "commonjs",
+  "scripts": {
+    "example:env:dev": "rimraf ./example/.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=DEVELOPMENT' && node -r dotenv/config example dotenv_config_path=./example/envs/dev.env",
+    "example:env:prod": "rimraf ./example/.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=PRODUCTION' &&node -r dotenv/config example dotenv_config_path=./example/envs/prod.env",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "*",
+    "npm": "*"
+  },
+  "author": "anon",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "dotenv-expand": "^5.1.0",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "x-utils-es": "^2.4.0"
+  }
+}
