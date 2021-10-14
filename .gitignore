@@ -8,8 +8,10 @@ info.md
 docs
 coverage
 assets
+old
 todo
 todo.md
+example.js
 # Docker
 Dockerfile
 docker-compose.yml

@@ -7,8 +7,8 @@
 *  Above script will initially remove last .env file, then preset ENVIRONMENT we want to work with, should match  property value of dev.env, then execute initial script (this example script) including dev.env default settings
 */
 
+const {XEnv,readENV} = require('../esm')
 
-const {XEnv,readENV} = require('../libs/XEnv')
 const path = require('path')
 const options = {
     /**  Dir location of {xxx}.env files */
@@ -24,7 +24,6 @@ const options = {
 }
     
 const xEnv = new XEnv(options,true)
-
 
 /** 
 * - Check if dev.env and prod.env exist in {envDir} 

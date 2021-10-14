@@ -1,19 +1,19 @@
 
 
-const { readSingle } = require('read-env-file');
+import { readSingle } from 'read-env-file';
+import { ENV } from "@interface";
 
 /**
 * Read current .env file as an object, already parsed
 * @param {string} envRootFilePath provide full url to the current environment
-* @returns {object} transpiled and parsed .env to object
 */
-exports.readENV = (envRootFilePath, debug = false) => {
+export const readENV = (envRootFilePath: string, debug = false): ENV | undefined => {
     if (!envRootFilePath) {
         return undefined
     }
     try {
-        return readSingle.sync(envRootFilePath)
-    } catch (err) {
+        return readSingle.sync(envRootFilePath) as ENV | undefined
+    } catch (err: any) {
         if (debug) console.error(err.toString())
     }
     return undefined
@@ -21,10 +21,8 @@ exports.readENV = (envRootFilePath, debug = false) => {
 
 /**
  * Convert .env parsed data back to .env file readable format
- * @param {object} parsed
- * @returns {string}
  */
-exports.makeEnvFormat = (parsed) => {
+export const makeEnvFormat = (parsed: object): string | undefined => {
     if (!parsed) return undefined
     if (parsed) {
         let envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {

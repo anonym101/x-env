@@ -45,15 +45,7 @@
                 ".jshintrc",
                 ".jsbeautifyrc"
             ]
-        },
-        "css": [
-            "css",
-            "scss"
-        ],
-        "html": [
-            "htm",
-            "html"
-        ]
+        }
         // ^^ providing just an array sets the VS Code file type
     },
     "standard.options": {
@@ -156,8 +148,12 @@
         ": ",
         " - "
     ],
-    "typescript.validate.enable": false,
+    "typescript.validate.enable": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    }
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
 }

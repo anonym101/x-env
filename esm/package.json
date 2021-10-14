@@ -1,0 +1,7 @@
+{
+    "name": "x-env",
+    "main": "./index.js",
+    "esm": {
+        "mode": "auto"
+    }
+}
