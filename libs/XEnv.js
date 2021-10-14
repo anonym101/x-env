@@ -13,7 +13,6 @@
 const fs = require('fs')
 const path = require('path')
 const dotenv = require('dotenv')
-const { log, isFalsy, onerror } = require('x-utils-es/esm')
 const { readENV, makeEnvFormat } = require('./utils')
 const variableExpansion = require('dotenv-expand')
 
@@ -35,7 +34,7 @@ class XEnv {
      */
     constructor(config, debug = false) {
         this.debug = debug
-        if (isFalsy(config)) throw 'Config not provided'
+        if (!config) throw 'Config not provided'
         if (!config.envDir) throw 'Must provide {envDir} full path'
         if (!config.baseRootEnv) throw 'Must provide {baseRootEnv} full path'
 
@@ -51,7 +50,7 @@ class XEnv {
     buildEnv(envName = undefined) {
 
         if (!this.checkEnvFileConsistency()) {
-            if (this.debug) onerror('[XEnv]', 'Failed consistency check!')
+            if (this.debug) console.log('[XEnv]', 'Failed consistency check!')
             return false
         }
 
@@ -118,12 +117,12 @@ class XEnv {
         let configSetFor = undefined
         if (!this.checkEnvPass) {
             configSetFor = ''
-            if (this.debug) onerror('[XEnv]', 'checkEnvPass===false, did you call method: checkEnvFileConsistency() ?')
+            if (this.debug) console.log('[XEnv]', 'checkEnvPass===false, did you call method: checkEnvFileConsistency() ?')
             return undefined
         }
 
         if (!process.env.ENVIRONMENT) {
-            if (this.debug) onerror('[XEnv]', 'process.env.ENVIRONMENT is not set ?')
+            if (this.debug) console.log('[XEnv]', 'process.env.ENVIRONMENT is not set ?')
             return undefined
         }
 
@@ -169,7 +168,7 @@ class XEnv {
         if (envName === 'PRODUCTION' && this.envFile['prod.env']) sourcePath = this.envFile['prod.env']
 
         if (!sourcePath) {
-            if (this.debug) onerror('[XEnv]', `Wrong envName: ${envName}`)
+            if (this.debug) console.log('[XEnv]', `Wrong envName: ${envName}`)
             throw `Wrong envName:${envName}`
         }
 
@@ -186,9 +185,9 @@ class XEnv {
                 const envData = makeEnvFormat(data.parsed)
                 if (envData) fs.writeFileSync(baseRootEnv, envData)
 
-                if (envName === 'TEST') log('TEST environment set')
-                if (envName === 'DEVELOPMENT') log('DEVELOPMENT environment set')
-                if (envName === 'PRODUCTION') log('PRODUCTION environment set')
+                if (envName === 'TEST') console.log('TEST environment set')
+                if (envName === 'DEVELOPMENT') console.log('DEVELOPMENT environment set')
+                if (envName === 'PRODUCTION') console.log('PRODUCTION environment set')
 
             } else {
                 throw data.error
@@ -196,7 +195,7 @@ class XEnv {
 
             return true
         } catch (err) {
-            onerror('[XEnv]', err.toString())
+            console.log('[XEnv]', err.toString())
 
         }
 
@@ -219,17 +218,17 @@ class XEnv {
             let prodFileKeys = Object.keys(envList.filter(n => n.type === 'prod.env')[0] || {})
 
             if (!devFileKeys.length) {
-                if (this.debug) onerror('[XEnv]', 'dev.env not set or not provided')
+                if (this.debug) console.log('[XEnv]', 'dev.env not set or not provided')
                 return false
             }
 
             if (!prodFileKeys.length) {
-                if (this.debug) onerror('[XEnv]', 'prod.env not set or not provided')
+                if (this.debug) console.log('[XEnv]', 'prod.env not set or not provided')
                 return false
             }
 
             if (this.envFile['test.env'] && !testFileKeys.length) {
-                if (this.debug) onerror('[XEnv]', 'test.env not set or not provided')
+                if (this.debug) console.log('[XEnv]', 'test.env not set or not provided')
                 return false
             }
 
@@ -238,13 +237,13 @@ class XEnv {
 
             if (this.envFile['test.env']) {
                 if (testFileKeys.length !== devFileKeys.length) {
-                    if (this.debug) onerror('[XEnv]', 'test.env is not consistent with the other .env files')
+                    if (this.debug) console.log('[XEnv]', 'test.env is not consistent with the other .env files')
                     lenOk = false
                 }
             }
             const mustHaveENVIRONMENT = devFileKeys.filter(v => v === 'ENVIRONMENT').length === 1
             if (!mustHaveENVIRONMENT) {
-                if (this.debug) onerror('[XEnv]', 'All .env files should include {ENVIRONMENT} property')
+                if (this.debug) console.log('[XEnv]', 'All .env files should include {ENVIRONMENT} property')
                 return false
             }
 
@@ -253,7 +252,7 @@ class XEnv {
 
             return lenOk
         } catch (err) {
-            onerror('[XEnv]', err.toString())
+            console.log('[XEnv]', err.toString())
         }
         return false
     }

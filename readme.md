@@ -12,7 +12,7 @@ Project environment manager for `TEST`, `DEVELOPMENT`, or `PRODUCTION`  be used 
 
 
 
-#### Instalation
+#### Installation
 
 ```sh
 $/ npm i x-env
@@ -49,18 +49,16 @@ What happens here:
 ```js
 // xenvScript
 
-const XEnv = require('x-env')
+const {XEnv,readENV} = require('x-env')
 const path = require('path')
 
 const options = {
-    /**  Dir location of xxx.env files 
-    * minimum requirement for dev.env, and prod.env
-    */
+    /**  Dir location of xxx.env files */
     envDir:path.join(__dirname,'./envs'),
     /** 
-     * Environment types in our project, support: test.env (optional), dev.env (required), prod.env (required) - and should exist in {envDir}
+     * Environment types in our project, current support: test.env (optional), dev.env (required), prod.env (required) - these should exist in {envDir}, have consistent property names with at least {ENVIRONMENT} being set
      */
-    envFileTypes:['dev.env','prod.env'],
+    envFileTypes:['dev.env','prod.env','test.env'],
     /** Full path with filename, usually project root ./
       * This file gets updated based on current environment  
     */
@@ -69,44 +67,26 @@ const options = {
     
 const xEnv = new XEnv(options,true)
 
-/**
-* - Check if dev.env and prod.env exist in {envDir} 
-* - Check consistency, each file should include same property names
-* - Each xx.env file should {ENVIRONMENT} variable set
-*/
-if (!xEnv.checkEnvFileConsistency()) throw '{name}.env consistency is not valid'
 
 /** 
+* - Check if dev.env and prod.env exist in {envDir} 
 * - Check if checkEnvFileConsistency was ren and passed
+* - Check consistency, each file should include same property names
+* - Each xx.env file should {ENVIRONMENT} variable set
 * - Check if process.env.ENVIRONMENT is already set by initial script setting in package.json
 * - Check to see if {name}.env for each available file has {ENVIRONMENT} set, and compares with process.env.ENVIRONMENT
 * - Finally re-process process.env config base on {process.env.ENVIRONMENT} file selection
 */
-if(!xEnv.setEnvironment()) throw('environment not set')
 
-
-
-/**
-* *NOW WE HAVE ACCESS* TO our env and can run this script anywhere in your app.
-* Print object data of current environment of .env file at root of your application 
-* @returns {}
-*/
-const getEnvConfig = ()=>{
-    const variableExpansion = require('dotenv-expand')
-    // will provide environment from application root
-
-    const myEnv = xEnv.dotenv.config()
-    const env = variableExpansion(myEnv)
-    // console.log(env.error || env.parsed)
-    return env
-}
-
-console.log(getEnvConfig())
-console.log('true === ',process.env.ENVIRONMENT === getEnvConfig().parsed.ENVIRONMENT)
+// can optionally set environment type, otherwise detected based on package.json script setting
+if(!xEnv.buildEnv(/** DEVELOPMENT */)) throw('environment build failed')
+ 
+console.log(readENV(options.baseRootEnv))
+console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv).ENVIRONMENT)
 
 ``` 
 
 ### Access to env
 Once `x-env` script (xenvScript/ your script) was executed before application, you will gain access to `./env`
-root variables when using `process.env`, or `getEnvConfig()` example method as demonstrated above.
+root variables when using `process.env`, or `readENV()` example method as demonstrated above.
 

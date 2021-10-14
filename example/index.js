@@ -11,7 +11,7 @@
 const {XEnv,readENV} = require('../libs/XEnv')
 const path = require('path')
 const options = {
-    /**  Dir location of xxx.env files */
+    /**  Dir location of {xxx}.env files */
     envDir:path.join(__dirname,'./envs'),
     /** 
      * Environment types in our project, current support: test.env (optional), dev.env (required), prod.env (required) - these should exist in {envDir}, have consistent property names with at least {ENVIRONMENT} being set
