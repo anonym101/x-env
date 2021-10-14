@@ -1,6 +1,10 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "emitDeclarationOnly":true,
+    "typeRoots": [
+      "./node_module/@types"
+    ],
     "declaration": true,
     "sourceMap": false,
     "checkJs":true,

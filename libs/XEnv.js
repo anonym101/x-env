@@ -1,12 +1,12 @@
 /** 
  * @description XEnv class, based on package.json env:dev, env:prod, these scripts are initialized 
- * */
+ **/
 
 /**
- * Default ENV settings, maybe differnt in your application
- * @typedef {{IP:string,PORT:string,ENVIRONMENT:'DEVELOPMENT'|'PRODUCTION',HOST:string}} ENV
- * @typedef {'TEST'|'DEVELOPMENT'|'PRODUCTION'} ENVIRONMENT
+ * Default ENV settings, maybe different in your application
  * @typedef {'test.env'|'dev.env'|'prod.env'} EnvFileType
+ * @typedef {{IP:string,PORT:string,ENVIRONMENT:'DEVELOPMENT'|'PRODUCTION',HOST:string, type?:EnvFileType}} ENV
+ * @typedef {'TEST'|'DEVELOPMENT'|'PRODUCTION'} ENVIRONMENT
  * @typedef {{'test.env'?:string,'dev.env'?:string,'prod.env'?:string}} EnvFile
  */
 
@@ -14,9 +14,12 @@ const fs = require('fs')
 const path = require('path')
 const dotenv = require('dotenv')
 const { log, isFalsy, onerror } = require('x-utils-es/esm')
+const { readENV, makeEnvFormat } = require('./utils')
 const variableExpansion = require('dotenv-expand')
 
 class XEnv {
+
+    dotenv = dotenv
     checkEnvPass = false
 
     /** @type {{envDir:string,envFileTypes:Array<EnvFileType>, baseRootEnv:string}} */
@@ -27,8 +30,8 @@ class XEnv {
      * @param {Object} config Your config file goes here
      * @param {string} config.envDir Dir location of files
      * @param {Array<EnvFileType>} config.envFileTypes Environment types we will be dealing with on the project, current support for: test.env, dev.env, prod.env  
-     * @param {string} config.baseRootEnv Full path location of .env file to which current environment is copied to, usualy at base of your application: ./.env
-     * @param {boolean} debug Display usefull messages, errors always show 
+     * @param {string} config.baseRootEnv Full path location of .env file to which current environment is copied to, usually at base of your application: ./.env
+     * @param {boolean} debug Display useful messages, errors always show 
      */
     constructor(config, debug = false) {
         this.debug = debug
@@ -45,24 +48,18 @@ class XEnv {
      * @param {ENVIRONMENT?} envName Choose which environment to look out for, if not set will be selected based on package.json setting
      * @returns {boolean}
      */
-    setEnvironment(envName = undefined) {
-        if (envName) {
-            if (this.setNewEnvConfig(envName)) {
-                return this.copyRenameToLocation(envName)
-            }
-        }
-        else {
-            let pass = false
-            // run one iteration based on package.json settings
-            this.environments.forEach(envNm => {
-                if (this.setNewEnvConfig(envNm)) {
-                    pass = this.copyRenameToLocation(envNm)
-                }
-            })
-            return pass
-        }
-    }
+    buildEnv(envName = undefined) {
 
+        if (!this.checkEnvFileConsistency()) {
+            if (this.debug) onerror('[XEnv]', 'Failed consistency check!')
+            return false
+        }
+
+        let envNameConfirmed = this.setNewEnvConfig(envName)
+        if (envNameConfirmed) return this.copyRenameToLocation(envNameConfirmed)
+        else return false
+
+    }
 
     /** 
      * Access env file, full path
@@ -76,81 +73,80 @@ class XEnv {
         }
     }
 
-    /**
-     * Read available file by env name
-     * @param {ENVIRONMENT} envName Read choice name, does not reflect name  per your .env file
-     * @returns {ENV} Your env config may vary in settings but {ENVIRONMENT} should always be set
-     */
-    readEnvFile(envName, noDebug = false) {
-        let name = ''
-        if (envName === 'TEST' && this.envFile['test.env']) name = 'test.env'
-        if (envName === 'DEVELOPMENT' && this.envFile['dev.env']) name = 'dev.env'
-        if (envName === 'PRODUCTION' && this.envFile['prod.env']) name = 'prod.env'
-        let file = path.join(this.config.envDir, `./${name}`)
-
-      
-        if(!name)  return undefined
-        try {
-           
-            let data = dotenv.parse(fs.readFileSync(file))
-
-             // @ts-ignore
-            return data
-        } catch (err) {
-            if (this.debug && noDebug) onerror('[XEnv]',` file not found for: ${envName}`,err.toString())
-        }
-        return undefined
-    }
 
     /**
      * Available environments based on our {config} setting
-     * @type {ENVIRONMENT[]} */
-    get environments() {
+     * @param {boolean?} selected only list selected environment when true
+     * @returns {ENV []} */
+    environments(selected = false) {
+
+        /** @param {EnvFileType} envFileName */
+        const env = (envFileName) => {
+            const filePath = path.join(this.config.envDir, `./${envFileName}`)
+            /** @type {ENV} */
+            let data = readENV(filePath, false) || {}
+            data = {
+                ...data,
+                type: envFileName
+            }
+
+            if (selected) {
+                if (data.ENVIRONMENT === process.env.ENVIRONMENT) return data
+            } else return data
+        }
+
         // @ts-ignore
-        return [this.envFile['test.env'] ? 'TEST' : null, this.envFile['dev.env'] ? 'DEVELOPMENT' : null, this.envFile['prod.env'] ? 'PRODUCTION' : null].filter(v => !!v)
+        return [this.envFile['test.env'] ? env('test.env') : null, this.envFile['dev.env'] ? env('dev.env') : null, this.envFile['prod.env'] ? env('prod.env') : null].filter(v => !!v)
     }
 
 
     /**
      * Set dotenv config based on process.env.ENVIRONMENT settings in package.json for your desired environment to perform our new .env builds
      * - package.json ENVIRONMENT variable should reflect your xx.env variable
-     * @param {ENVIRONMENT} envName Build choice name, does not reflect name per your .env file
-     * @returns {boolean}
+     * @param {ENVIRONMENT?} envName Build choice name, does not reflect name per your .env file
+     * @returns {ENVIRONMENT}
      */
-    setNewEnvConfig(envName) {
+    setNewEnvConfig(envName = undefined) {
 
         /**
          * 1. First check if checkEnvFileConsistency was ren and passed
          * 2. Check process.env.ENVIRONMENT is already set by initial script setting in package.json
          * 3. Check to see if {name}.env for each available file has {ENVIRONMENT} set, and compares with process.env.ENVIRONMENT
-         * 4. Finally reset global config {process.env.ENVIRONMENT} base on file selection 
+         * 4. Finally re-process process.env config base on {process.env.ENVIRONMENT} file selection
          */
 
-        let configSet = false
-
+        let configSetFor = undefined
         if (!this.checkEnvPass) {
-            configSet = false
+            configSetFor = ''
             if (this.debug) onerror('[XEnv]', 'checkEnvPass===false, did you call method: checkEnvFileConsistency() ?')
-            return false
+            return undefined
         }
 
         if (!process.env.ENVIRONMENT) {
             if (this.debug) onerror('[XEnv]', 'process.env.ENVIRONMENT is not set ?')
-            return false
+            return undefined
         }
 
-        // base on selected environment perform  dotenv.config() update
-        this.environments.filter(v => v === envName).forEach(envNm => {
-            if ((this.readEnvFile(envNm,true) || {}).ENVIRONMENT === process.env.ENVIRONMENT) {
-                const fileName = envName === 'TEST' ? 'test.env' : envName === 'DEVELOPMENT' ? 'dev.env' : envName === 'PRODUCTION' ? 'prod.env' : undefined
+        // base on selected environment perform dotenv.config() update
+        const ENVIRONMENT = process.env.ENVIRONMENT
+        this.environments(true).filter(env => envName && env ? envName === env.ENVIRONMENT : !!env).forEach(env => {
+
+            if (!env) return
+            if (configSetFor) return
+
+            let fileData = env.ENVIRONMENT
+            if (fileData === ENVIRONMENT) {
+
+                // @ts-ignore
+                const fileName = env.ENVIRONMENT === 'TEST' ? 'test.env' : env.ENVIRONMENT === 'DEVELOPMENT' ? 'dev.env' : env.ENVIRONMENT === 'PRODUCTION' ? 'prod.env' : undefined
                 if (fileName) {
-                    dotenv.config({ path: path.join(__dirname, './test.env') })
-                    configSet = true
+                    this.dotenv.config({ path: path.join(this.config.envDir, `./${fileName}`) })
+                    configSetFor = env.ENVIRONMENT
                 }
             }
         })
 
-        return configSet
+        return configSetFor
     }
 
     /**
@@ -164,7 +160,7 @@ class XEnv {
     copyRenameToLocation(envName) {
         let sourcePath, destPath
         // check if user provided path only to the root dir or included .env in the path
-        const baseRootEnv = this.config.baseRootEnv.indexOf('.env')===-1 ?  path.join(this.config.baseRootEnv, '.env'):this.config.baseRootEnv
+        const baseRootEnv = this.config.baseRootEnv.indexOf('.env') === -1 ? path.join(this.config.baseRootEnv, '.env') : this.config.baseRootEnv
 
         const rootEnvFilePath = baseRootEnv
         destPath = rootEnvFilePath
@@ -173,23 +169,38 @@ class XEnv {
         if (envName === 'PRODUCTION' && this.envFile['prod.env']) sourcePath = this.envFile['prod.env']
 
         if (!sourcePath) {
-            if (this.debug) onerror('[XEnv]', `wrong envName: ${envName}`)
+            if (this.debug) onerror('[XEnv]', `Wrong envName: ${envName}`)
             throw `Wrong envName:${envName}`
         }
 
-        // File destination will be created or overwritten by default.
         try {
+
+            // copy new file at root
             fs.copyFileSync(sourcePath, destPath)
-            if (envName === 'TEST') log('TEST environment set')
-            if (envName === 'DEVELOPMENT') log('DEVELOPMENT environment set')
-            if (envName === 'PRODUCTION') log('PRODUCTION environment set')
+            // once copied, we parse the file and rewrite it 
+            const data = variableExpansion({ parsed: this.dotenv.parse(fs.readFileSync(baseRootEnv)) })
+
+            if (data.parsed) {
+
+                // convert parsed .env to its format
+                const envData = makeEnvFormat(data.parsed)
+                if (envData) fs.writeFileSync(baseRootEnv, envData)
+
+                if (envName === 'TEST') log('TEST environment set')
+                if (envName === 'DEVELOPMENT') log('DEVELOPMENT environment set')
+                if (envName === 'PRODUCTION') log('PRODUCTION environment set')
+
+            } else {
+                throw data.error
+            }
+
             return true
         } catch (err) {
             onerror('[XEnv]', err.toString())
 
         }
 
-        throw `File not found or wrong envName: ${envName}`
+        throw `File not found, or wrong envName: ${envName}`
     }
 
     /**
@@ -200,16 +211,18 @@ class XEnv {
      */
     checkEnvFileConsistency() {
         try {
+
+            let envList = this.environments()
             this.checkEnvPass = false
-            let testFileKeys = this.envFile['test.env'] ? Object.keys(this.readEnvFile('TEST') || {}) :[]
-            let devFileKeys = Object.keys(this.readEnvFile('DEVELOPMENT') || {})
-            let prodFileKeys = Object.keys(this.readEnvFile('PRODUCTION') || {})
+            let testFileKeys = this.envFile['test.env'] ? Object.keys(envList.filter(n => n.type === 'test.env')[0] || {}) : []
+            let devFileKeys = Object.keys(envList.filter(n => n.type === 'dev.env')[0] || {})
+            let prodFileKeys = Object.keys(envList.filter(n => n.type === 'prod.env')[0] || {})
 
             if (!devFileKeys.length) {
                 if (this.debug) onerror('[XEnv]', 'dev.env not set or not provided')
                 return false
             }
-            
+
             if (!prodFileKeys.length) {
                 if (this.debug) onerror('[XEnv]', 'prod.env not set or not provided')
                 return false
@@ -219,13 +232,13 @@ class XEnv {
                 if (this.debug) onerror('[XEnv]', 'test.env not set or not provided')
                 return false
             }
-    
+
 
             let lenOk = devFileKeys.filter((x) => prodFileKeys.filter((y) => x === y).length).length === devFileKeys.length
 
             if (this.envFile['test.env']) {
                 if (testFileKeys.length !== devFileKeys.length) {
-                    if (this.debug) onerror('[XEnv]', 'test.env is not consistant with the other .env files')
+                    if (this.debug) onerror('[XEnv]', 'test.env is not consistent with the other .env files')
                     lenOk = false
                 }
             }
@@ -246,23 +259,10 @@ class XEnv {
     }
 }
 
-module.exports = XEnv
-
-// const XEnv = new XEnv()
-// if (!XEnv.checkEnvFileConsistency()) throw '{name}.env consistentancy is not valid'
-
-// // NOTE load dev.env
-// if (process.env.ENVIRONMENT === 'DEVELOPMENT') {
-//     dotenv.config({ path: path.join(__dirname, './dev.env') })
-//     XEnv.copyRenameToLocation('DEVELOPMENT')
-// }
-// // NOTE load prod.env
-// if (process.env.ENVIRONMENT === 'PRODUCTION') {
-//     dotenv.config({ path: path.join(__dirname, './prod.env') })
-//     XEnv.copyRenameToLocation('PRODUCTION')
-// }
-
-// // print results to cli
-// const myEnv = dotenv.config()
-// const env = variableExpansion(myEnv)
-// console.log(env.error || env.parsed)
+exports.XEnv = XEnv;
+/**
+* Read current .env file data as an object
+* @param {string} envRootFilePath provide full url to the current environment
+* @returns {object} transpiled and parsed .env to object
+*/
+exports.readENV = readENV

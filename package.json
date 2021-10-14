@@ -5,8 +5,9 @@
   "main": "./libs/XEnv.js",
   "type": "commonjs",
   "scripts": {
-    "example:env:dev": "rimraf ./example/.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=DEVELOPMENT' && node -r dotenv/config example dotenv_config_path=./example/envs/dev.env",
-    "example:env:prod": "rimraf ./example/.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=PRODUCTION' &&node -r dotenv/config example dotenv_config_path=./example/envs/prod.env",
+    "example:env:dev": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=DEVELOPMENT' && node -r dotenv/config example dotenv_config_path=./example/envs/dev.env",
+    "example:env:prod": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=PRODUCTION' &&node -r dotenv/config example dotenv_config_path=./example/envs/prod.env",
+    "example:env:test": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=TEST' &&node -r dotenv/config example dotenv_config_path=./example/envs/test.env",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -16,8 +17,10 @@
   "author": "anon",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^16.10.9",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
+    "read-env-file": "^2.0.3-0",
     "rimraf": "^3.0.2"
   },
   "dependencies": {
