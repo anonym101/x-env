@@ -11,7 +11,7 @@
     "example:env:prod": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=PRODUCTION' &&node -r dotenv/config example dotenv_config_path=./example/envs/prod.env",
     "example:env:test": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=TEST' &&node -r dotenv/config example dotenv_config_path=./example/envs/test.env",
     "build": "rimraf dist/ &&tsc --project .",
-    "build:esm": " npm run build&& babel --config-file ./esm/.babelrc ./dist --out-dir ./esm",
+    "build:cjs": " npm run build&& babel --config-file ./cjs/.babelrc ./dist --out-dir ./cjs",
     "lint:install": "npm i tslint --save-dev",
     "lint:fix": "./node_modules/.bin/tslint  --fix -c tslint.json lib/**/*",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -34,7 +34,6 @@
     "babel-preset-minify": "^0.5.1",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
-    "esm": "^3.2.25",
     "read-env-file": "^2.0.3-0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.2.1",

@@ -7,7 +7,7 @@
 *  Above script will initially remove last .env file, then preset ENVIRONMENT we want to work with, should match  property value of dev.env, then execute initial script (this example script) including dev.env default settings
 */
 
-const {XEnv,readENV} = require('../esm')
+const {XEnv,readENV} = require('../cjs')
 
 const path = require('path')
 const options = {
