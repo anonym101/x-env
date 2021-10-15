@@ -1,6 +1,6 @@
 ### x-env
 Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env`
-not
+
 
 #### Why use it
 
@@ -116,6 +116,47 @@ console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv)
 #### Access to env
 Once `x-env` script (xenvExample/** ) was executed before application, you gain access to `./env`
 root variables using `process.env`, or `readENV(...)`.
+
+
+#### ENVIRONMENTS
+Typical environment structure.
+Xenv requires minimum of ENVIRONMENT property to be set, all other variables must have *consistent* names
+
+
+*dev.env*
+```sh
+# dev.env
+# initial data
+IP=::1
+PORT=5000
+ENVIRONMENT=DEVELOPMENT
+# host api server url
+HOST=http://localhost:${PORT}
+```
+
+
+*prod.env*
+```sh
+# prod.env
+# initial data
+IP=0.0.0.0
+PORT=12345
+ENVIRONMENT=PRODUCTION
+# host api server url
+HOST=http://${IP}:${PORT}
+```
+
+
+When current environment is in PRODUCTION *.env* root file would transpile to:
+```sh
+# .env
+IP=0.0.0.0
+PORT=12345
+ENVIRONMENT=PRODUCTION
+HOST=http://0.0.0.0:12345
+```
+
+
 
 &nbsp;
 

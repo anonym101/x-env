@@ -9,6 +9,11 @@
   "esm": {
     "mode": "auto"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anonym101/x-env"
+  },
+  "homepage": "https://github.com/anonym101/",
   "scripts": {
     "example:env:dev": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/dev.env",
     "example:env:prod": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/prod.env",
