@@ -1,16 +1,16 @@
 ### x-env
-Project environment manager for `TEST`, `DEVELOPMENT`, or `PRODUCTION`  be used to assign .env values to your `process.env`
-
-
+Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env`
+not
 
 #### Why use it
 
 - Custom project
 - No ENVIRONMENT setup available
 - Use .env at base of your project
+- Use dev.env, prod.env and test.env environments
 - Same ENVIRONMENT structure for all of your projects
-
-
+- CJS, ESM, Typescript support
+- DefinitelyTyped
 
 #### Installation
 
@@ -19,61 +19,86 @@ $/ npm i x-env
 ```
 
 #### Setup
-We have to setup pre process script that gets called before our application start, we could call via bash script, or npm script.
+To setup pre process script called before our application, we run an npm script.
 
 NPM example :
 ```js
- //  Execution script in projects dir at: ./xenvScript
+ //  Execution script at: ./xenvExample
  // ...package.json
-   "scripts": {
-    "env:dev": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=DEVELOPMENT' && node -r dotenv/config ./xenvScript dotenv_config_path=./xenvScript/envs/dev.env",
-    "env:prod": "rimraf ./.env && node -e 'DOTENV_CONFIG_ENVIRONMENT=PRODUCTION' &&node -r dotenv/config ./xenvScript dotenv_config_path=./xenvScript/envs/prod.env",
+  "scripts": {
+    "example:env:dev": "rimraf ./.env && node -r dotenv/config ./xenvExample dotenv_config_path=./xenvExample/envs/dev.env",
+    "example:env:prod": "rimraf ./.env && node -r dotenv/config ./xenvExample dotenv_config_path=./xenvExample/envs/prod.env",
   }
 
-  // /$ npm env:dev # generates new .env at root of your project 
+  //$ npm example:env:dev # generates new .env at project root
 ```
-Above `env:dev` gets executed removing pre/existing ./.env then sets ENVIRONMENT=DEVELOPMENT same as in your env:dev file, then executes the script at `./xenvScript/index` with dotenv>dev.env default settings.
+npm `example:env:dev` removes pre/existing ./.env, then executes `./xenvScript/index` following dev.env settings.
 
+
+
+#### Support versions 
+
+Versions: Typescript, ESM, CJS _(Commonjs)_
+
+```js
+// Typescript, use source
+import {XEnv,readENV} from 'x-env/src';
+
+// ESM
+import {XEnv,readENV} from 'x-env';
+
+// CJS
+import {XEnv,readENV} from 'x-env/cjs';
+const {XEnv,readENV} = require('x-env/cjs');
+
+```
 
 
 #### Example usage
 Run initial script before application
 
+- refer to **x-env/xenvExample/readme.md**
+
 What happens here:
 
-* Example Script showing how to setup your .env environment file for access in current environment setting
-* Initially we have to setup pre process script that gets called before our application does, we could call a bash script, or an npm script, for DEVELOPMENT dev.env _(per Setup above)_:  
-*  Above script will initially remove last .env file, then preset ENVIRONMENT we want to work with _(should match property value in dev.env)_, then execute initial script (xenvScript) including dev.env as default settings.
+* Example Script showing how to setup your .env file for access in current environment setting
+* Initially we have to setup pre process script before our application starts  
+* Your current environment settings are parsed and transfered to root .env file
 
 
 ```js
-// xenvScript
+
+// xenvExample/** script
 
 const {XEnv,readENV} = require('x-env')
 const path = require('path')
 
 const options = {
-    /**  Dir location of xxx.env files */
+    /**  Dir location of xxx.env files. 
+     * @required
+    */
     envDir:path.join(__dirname,'./envs'),
+
     /** 
-     * Environment types in our project, current support: test.env (optional), dev.env (required), prod.env (required) - these should exist in {envDir}, have consistent property names with at least {ENVIRONMENT} being set
+     * Environment types in our project, support: test.env (optional), dev.env (required), prod.env (required), with consistent property names, and at least {ENVIRONMENT} set
+     * @required
      */
     envFileTypes:['dev.env','prod.env','test.env'],
-    /** Full path with filename, usually project root ./
+
+    /** Full path and filename, usually project root ./
       * This file gets updated based on current environment  
+      * @required
     */
     baseRootEnv: path.join(__dirname,'../.env')
 }
-    
+
+// Our class constructor
 const xEnv = new XEnv(options,true)
 
 
 /** 
 * - Check if dev.env and prod.env exist in {envDir} 
-* - Check if checkEnvFileConsistency was ren and passed
 * - Check consistency, each file should include same property names
-* - Each xx.env file should {ENVIRONMENT} variable set
-* - Check if process.env.ENVIRONMENT is already set by initial script setting in package.json
 * - Check to see if {name}.env for each available file has {ENVIRONMENT} set, and compares with process.env.ENVIRONMENT
 * - Finally re-process process.env config base on {process.env.ENVIRONMENT} file selection
 */
@@ -81,12 +106,23 @@ const xEnv = new XEnv(options,true)
 // can optionally set environment type, otherwise detected based on package.json script setting
 if(!xEnv.buildEnv(/** DEVELOPMENT */)) throw('environment build failed')
  
+
+// read .env file in current/live environment  
 console.log(readENV(options.baseRootEnv))
 console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv).ENVIRONMENT)
 
 ``` 
 
-### Access to env
-Once `x-env` script (xenvScript/ your script) was executed before application, you will gain access to `./env`
-root variables when using `process.env`, or `readENV()` example method as demonstrated above.
+#### Access to env
+Once `x-env` script (xenvExample/** ) was executed before application, you gain access to `./env`
+root variables using `process.env`, or `readENV(...)`.
+
+&nbsp;
+
+
+
+## Contact
+Have questions, or would like to submit feedback [contact eaglex.net](https://eaglex.net/app/contact?product=x-env)
+
+
 

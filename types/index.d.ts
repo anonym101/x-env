@@ -43,12 +43,15 @@ export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
 
 
 /** 
-* Project environment manager for TEST, DEVELOPMENT, or PRODUCTION  be used to assign .env values to your `process.env */
+* Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env*/
 export class XEnv {
     checkEnvPass: boolean
     config: XCONFIG
     debug: boolean
     run(config: XCONFIG, debug: boolean): void;
+      /**
+     * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
+     */
     buildEnv(envName: ENVIRONMENT): boolean;
     envFile: EnvFile;
     environments(selected: boolean): XENV[];

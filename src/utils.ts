@@ -1,7 +1,7 @@
 
 
 import { readSingle } from 'read-env-file';
-import { ENV } from "@interface";
+import { ENV } from '@interface';
 
 /**
 * Read current .env file as an object, already parsed
@@ -25,7 +25,7 @@ export const readENV = (envRootFilePath: string, debug = false): ENV | undefined
 export const makeEnvFormat = (parsed: object): string | undefined => {
     if (!parsed) return undefined
     if (parsed) {
-        let envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
+        const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
                 n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`
             }

@@ -1,6 +1,7 @@
 {
     "cSpell.language": "en",
     "jslint.enable": false,
+    "tslint.enable": true,
     "standard.enable":true,
     "editor.quickSuggestions": {
         "other": true,
@@ -20,6 +21,7 @@
         ".vue",
         ".json"
       ],
+    
     "eslint.enable": true,
     "eslint.autoFixOnSave":true,
     "javascript.validate.enable":true,
@@ -150,7 +152,9 @@
     ],
     "typescript.validate.enable": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": true,
+        // For TSLint
+        "source.fixAll.tslint": true,
     },
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"

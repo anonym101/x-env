@@ -1,6 +1,6 @@
-import { copyFileSync, readFileSync, writeFileSync } from 'fs';
+import { copyFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parse, config } from 'dotenv';
+import { config } from 'dotenv';
 import { readENV, makeEnvFormat } from './utils';
 import variableExpansion from 'dotenv-expand';
 import { onerror, isFalsy, log } from 'x-utils-es/umd';
@@ -95,7 +95,8 @@ class XEnv {
         }
         try {
             copyFileSync(sourcePath, destPath);
-            const data = variableExpansion({ parsed: parse(readFileSync(baseRootEnv)) });
+            const selectedEnv = this.environments(true)[0];
+            const data = variableExpansion({ parsed: selectedEnv });
             if (data.parsed) {
                 const envData = makeEnvFormat(data.parsed);
                 if (envData)

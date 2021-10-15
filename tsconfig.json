@@ -39,7 +39,7 @@
     "./index"
   ],
   "exclude": [
-    "example",
+    "xenvExample",
     "node_modules",
     "dist",
     "esm"

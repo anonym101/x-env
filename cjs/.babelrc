@@ -14,13 +14,13 @@
         ],
         "@babel/preset-react",
         [
-            // "minify",
-            // {
-            //     "simplifyComparisons": false, // not a good idea
-            //     "keepFnName": true,
-            //     "mangle": false, // keep original method prop names for clarity
-            //     "deadcode": true
-            // }
+            "minify",
+            {
+                "simplifyComparisons": false, // not a good idea
+                "keepFnName": true,
+                "mangle": false, // keep original method prop names for clarity
+                "deadcode": true
+            }
         ]
     ],
     "plugins": [
@@ -32,7 +32,6 @@
                 "helpers":false,
                 "useESModules": false
             }
-        ],
-        
+        ]
     ]
 }

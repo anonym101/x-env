@@ -1,5 +1,5 @@
 {
     "name": "x-env",
-    "main": "./index.js",
+    "main": "./index.cjs",
     "type": "commonjs"
 }

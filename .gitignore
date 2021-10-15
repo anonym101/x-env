@@ -3,9 +3,6 @@ npm-debug.log
 info.md 
 # Local development
 
-# we only need dist to compile down to esm
-dist
-
 *.dev
 .DS_Store
 docs
