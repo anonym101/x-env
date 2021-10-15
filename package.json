@@ -1,6 +1,6 @@
 {
   "name": "x-env-es",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Project (.env) environment manager",
   "main": "./index.js",
   "module": "./cjs",
@@ -9,10 +9,20 @@
   "esm": {
     "mode": "auto"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anonym101/x-env"
+  },
+  "homepage": "https://github.com/anonym101/",
   "scripts": {
     "example:env:dev": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/dev.env",
     "example:env:prod": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/prod.env",
-    "example:env:test": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/test.env"
+    "example:env:test": "rimraf ./.env && node -r dotenv/config xenvExample dotenv_config_path=./xenvExample/envs/test.env",
+    "build": "rimraf dist/ &&tsc --project .",
+    "build:cjs": " npm run build&& babel --config-file ./cjs/.babelrc ./dist --out-dir ./cjs",
+    "lint:install": "npm i tslint --save-dev",
+    "lint:fix": "./node_modules/.bin/tslint  --fix -c tslint.json src/**/*",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     ".env",
@@ -24,12 +34,29 @@
     "test.env",
     "process.env"
   ],
+  "engineStrict": true,
   "engines": {
-    "node": "*",
-    "npm": "*"
+    "node": "~12.14.0",
+    "npm": "~6.13.4"
   },
   "author": "anon",
   "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
+    "@babel/plugin-transform-runtime": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-react": "^7.14.5",
+    "@types/node": "^16.10.9",
+    "babel-eslint": "^10.1.0",
+    "babel-preset-minify": "^0.5.1",
+    "esm": "^3.2.25",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.2.1",
+    "tslib": "^2.3.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.4.2"
+  },
   "dependencies": {
     "read-env-file": "^2.0.3-0",
     "dotenv": "^10.0.0",

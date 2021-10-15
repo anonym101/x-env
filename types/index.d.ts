@@ -48,7 +48,7 @@ export class XEnv {
     checkEnvPass: boolean
     config: XCONFIG
     debug: boolean
-    run(config: XCONFIG, debug: boolean): void;
+    constructor(config: XCONFIG, debug: boolean);
       /**
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
