@@ -113,8 +113,8 @@ if(!xEnv.buildEnv(/** DEVELOPMENT */)) throw('environment build failed')
  
 
 // read .env file in current/live environment  
-console.log(readENV(options.baseRootEnv))
-console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv).ENVIRONMENT)
+console.log(readENV(/*options.baseRootEnv*/))
+console.log('true === ',process.env.ENVIRONMENT === readENV(/*options.baseRootEnv*/).ENVIRONMENT)
 
 ``` 
 

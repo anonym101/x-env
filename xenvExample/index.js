@@ -35,7 +35,7 @@ const xEnv = new XEnv(options,true)
 // can optionally set environment type, otherwise detected based on package.json script setting
 if(!xEnv.buildEnv(/** DEVELOPMENT */)) throw('environment build failed')
  
-console.log(readENV(options.baseRootEnv))
-console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv).ENVIRONMENT)
+console.log(readENV(/*options.baseRootEnv*/))
+console.log('true === ',process.env.ENVIRONMENT === readENV(/*options.baseRootEnv*/).ENVIRONMENT)
 
 

@@ -65,4 +65,4 @@ export class XEnv {
 * Read current .env file as an object, already parsed
 * @param {string} envRootFilePath provide full url to the current environment
 */
-export function readENV(envRootFilePath: string, debug?:boolean):ENV 
+export function readENV(envRootFilePath?: string, debug?:boolean):ENV 

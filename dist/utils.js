@@ -1,8 +1,11 @@
 import { readSingle } from 'read-env-file';
+import path from 'path';
 export const readENV = (envRootFilePath, debug = false) => {
-    if (!envRootFilePath) {
-        return undefined;
-    }
+    const normalizePath = (pth = "") => {
+        pth = pth || path.resolve(process.cwd(), '.env');
+        return path.isAbsolute(pth) ? pth : path.resolve(process.cwd(), pth);
+    };
+    envRootFilePath = normalizePath(envRootFilePath);
     try {
         return readSingle.sync(envRootFilePath);
     }

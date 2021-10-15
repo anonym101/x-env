@@ -2,15 +2,21 @@
 
 import { readSingle } from 'read-env-file';
 import { ENV } from '@interface';
+import path from 'path'
 
 /**
 * Read current .env file as an object, already parsed
-* @param {string} envRootFilePath provide full url to the current environment
+* @param {string} envRootFilePath defaults to root .env, or provide full url to current .env
 */
-export const readENV = (envRootFilePath: string, debug = false): ENV | undefined => {
-    if (!envRootFilePath) {
-        return undefined
+export const readENV = (envRootFilePath?: string, debug = false): ENV | undefined => {
+
+    const normalizePath=(pth=""):string=> {
+        pth = pth || path.resolve(process.cwd(), '.env');
+        return path.isAbsolute(pth) ? pth : path.resolve(process.cwd(), pth);
     }
+
+    envRootFilePath = normalizePath(envRootFilePath)
+   
     try {
         return readSingle.sync(envRootFilePath) as ENV | undefined
     } catch (err: any) {
