@@ -55,15 +55,17 @@ const {XEnv,readENV} = require('x-env/cjs');
 
 
 #### Example usage
-Run initial script before application
+Run initial run script before application
 
-- refer to **x-env/xenvExample/readme.md**
+- refer to [readme](https://github.com/anonym101/x-env/blob/master/xenvExample/readme.md)
+
+
 
 What happens here:
 
 * Example Script showing how to setup your .env file for access in current environment setting
 * Initially we have to setup pre process script before our application starts  
-* Your current environment settings are parsed and transfered to root .env file
+* Your current environment settings are parsed and transpiled to root .env file
 
 
 ```js
@@ -148,6 +150,7 @@ HOST=http://${IP}:${PORT}
 
 
 When current environment is in PRODUCTION *.env* root file would transpile to:
+*.env*
 ```sh
 # .env
 IP=0.0.0.0

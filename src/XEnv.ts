@@ -1,5 +1,5 @@
 /**
- * @description Project environment manager for DEVELOPMENT, PRODUCTION, TEST, used to assign .env values to your `process.env
+ * @description Project (.env) manager for DEVELOPMENT, PRODUCTION, TEST, used to assign .env values to your `process.env
  * @namespace XEnv
  * @module x-env
  * @license MIT
