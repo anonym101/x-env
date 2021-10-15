@@ -1,5 +1,5 @@
 {
-  "name": "x-env",
+  "name": "ex-env",
   "version": "1.0.0",
   "description": "Project (.env) environment manager",
   "main": "./index.js",
