@@ -16,7 +16,7 @@ export const makeEnvFormat = (parsed) => {
     if (!parsed)
         return undefined;
     if (parsed) {
-        let envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
+        const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
                 n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`;
             }

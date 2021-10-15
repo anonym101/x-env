@@ -1,3 +1,3 @@
 ### EJS version
-Build/Transpile CommonJS supported module with babel
+Build/Transpiled CommonJS supported module
 
