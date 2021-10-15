@@ -3,6 +3,7 @@ npm-debug.log
 info.md 
 # Local development
 
+/.env
 *.dev
 .DS_Store
 docs
