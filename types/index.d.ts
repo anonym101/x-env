@@ -1,4 +1,7 @@
 
+/** Proposed environment name settings */
+export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
+
 
 
 /** Each xx.env file can contain any of these props */
@@ -9,10 +12,10 @@ export interface ENV {
 
 /** XEnv class internal type */
 export interface XENV {
-    IP: string;
-    PORT: string | number;
-    ENVIRONMENT: 'DEVELOPMENT' | 'PRODUCTION' | 'TEST';
-    HOST: string;
+    ENVIRONMENT: ENVIRONMENT;
+    IP?: string;
+    PORT?: string | number;
+    HOST?: string;
     /** To recognize to file name assignment, which env we are using, not carried to over */
     type?: EnvFileType;
 }
@@ -39,8 +42,6 @@ export interface XCONFIG {
     baseRootEnv: string
 }
 
-/** Proposed environment name settings */
-export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
 
 
 /** 
