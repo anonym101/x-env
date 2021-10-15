@@ -55,7 +55,7 @@ const {XEnv,readENV} = require('x-env-es/cjs');
 
 
 #### Example usage
-Run initial run script before application
+Run initial script before application
 
 - refer to [readme](https://github.com/anonym101/x-env/blob/master/xenvExample/readme.md)
 
@@ -75,6 +75,7 @@ What happens here:
 const {XEnv,readENV} = require('x-env-es')
 const path = require('path')
 
+/** @type {any} */
 const options = {
     /**  Dir location of xxx.env files. 
      * @required
@@ -119,6 +120,7 @@ console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv)
 Once `x-env-es` script (xenvExample/** ) was executed before application, you gain access to `./env`
 root variables using `process.env`, or `readENV(...)`.
 
+&nbsp;
 
 #### ENVIRONMENTS
 Typical environment structure.
@@ -150,6 +152,7 @@ HOST=http://${IP}:${PORT}
 
 
 When current environment is in PRODUCTION *.env* root file would transpile to:
+
 *.env*
 ```sh
 # .env

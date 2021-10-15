@@ -1,6 +1,6 @@
 {
   "name": "x-env-es",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Project (.env) environment manager",
   "main": "./index.js",
   "module": "./cjs",
@@ -24,10 +24,18 @@
     "test.env",
     "process.env"
   ],
+
   "engines": {
     "node": "*",
     "npm": "*"
   },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anonym101/x-env"
+  },
+  "homepage": "https://github.com/anonym101/",
+
   "author": "anon",
   "license": "MIT",
   "dependencies": {

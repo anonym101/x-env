@@ -2,6 +2,7 @@
 const {XEnv,readENV} = require('../cjs')
 const path = require('path')
 
+/** @type {any} */
 const options = {
     /**  Dir location of xxx.env files. 
      * @required

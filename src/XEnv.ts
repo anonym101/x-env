@@ -1,7 +1,7 @@
 /**
- * @description Project (.env) manager for DEVELOPMENT, PRODUCTION, TEST, used to assign .env values to your `process.env
+ * @description Project environment manager for DEVELOPMENT, PRODUCTION, TEST, used to assign .env values to your `process.env
  * @namespace XEnv
- * @module x-env
+ * @module x-env-es
  * @license MIT
  * {@link https://eaglex.net Eaglex}
  *

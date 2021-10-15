@@ -7,12 +7,13 @@ export interface ENV {
     ENVIRONMENT: string;
 }
 
+/** XEnv class internal type */
 export interface XENV {
     IP: string;
     PORT: string | number;
-    ENVIRONMENT: 'DEVELOPMENT' | 'PRODUCTION';
+    ENVIRONMENT: 'DEVELOPMENT' | 'PRODUCTION' | 'TEST';
     HOST: string;
-    /** To recognise to file name assignment, which env we are using, not carried to over */
+    /** To recognize to file name assignment, which env we are using, not carried to over */
     type?: EnvFileType;
 }
 
