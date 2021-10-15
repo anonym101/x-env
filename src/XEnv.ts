@@ -26,7 +26,7 @@ class XEnv {
      * Build env file based on package.json configuration
      * @param {boolean} debug Display useful messages, errors always show
      */
-    constructor(config: XCONFIG, debug = false) {
+    constructor(config: XCONFIG, debug:boolean = false) {
         this.debug = debug
         if (isFalsy(config)) throw new Error('Config not provided')
         if (!config.envDir) throw new Error('Must provide {envDir} full path')
@@ -39,13 +39,12 @@ class XEnv {
     /**
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
-    buildEnv(envName: ENVIRONMENT): boolean {
+    buildEnv(envName?: ENVIRONMENT): boolean {
         if (!this.checkEnvFileConsistency()) {
             if (this.debug) onerror('[XEnv]', 'Failed consistency check!')
             return false
         }
-
-        const envNameConfirmed = this.setNewEnvConfig(envName)
+        const envNameConfirmed = this.setNewEnvConfig(envName as any)
         if (envNameConfirmed) return this.copyRenameToLocation(envNameConfirmed)
         else return false
     }

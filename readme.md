@@ -43,6 +43,7 @@ Versions: Typescript, ESM, CJS _(Commonjs)_
 ```js
 // Typescript, use source
 import {XEnv,readENV} from 'x-env-es/src';
+// @types import {ENVIRONMENT,XCONFIG,EnvFile,EnvFileType,ENV} from 'x-env-es/src';
 
 // ESM
 import {XEnv,readENV} from 'x-env-es';
@@ -96,7 +97,8 @@ const options = {
 }
 
 // Our class constructor
-const xEnv = new XEnv(options,true)
+const DEBUG = true
+const xEnv = new XEnv(options,DEBUG)
 
 
 /** 
