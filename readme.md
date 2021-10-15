@@ -1,4 +1,4 @@
-### ex-env
+### x-env-es
 Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env`
 
 
@@ -15,7 +15,7 @@ Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments,
 #### Installation
 
 ```sh
-$/ npm i ex-env
+$/ npm i x-env-es
 ```
 
 #### Setup
@@ -42,14 +42,14 @@ Versions: Typescript, ESM, CJS _(Commonjs)_
 
 ```js
 // Typescript, use source
-import {XEnv,readENV} from 'ex-env/src';
+import {XEnv,readENV} from 'x-env-es/src';
 
 // ESM
-import {XEnv,readENV} from 'ex-env';
+import {XEnv,readENV} from 'x-env-es';
 
 // CJS
-import {XEnv,readENV} from 'ex-env/cjs';
-const {XEnv,readENV} = require('ex-env/cjs');
+import {XEnv,readENV} from 'x-env-es/cjs';
+const {XEnv,readENV} = require('x-env-es/cjs');
 
 ```
 
@@ -72,7 +72,7 @@ What happens here:
 
 // xenvExample/** script
 
-const {XEnv,readENV} = require('ex-env')
+const {XEnv,readENV} = require('x-env-es')
 const path = require('path')
 
 const options = {
@@ -116,7 +116,7 @@ console.log('true === ',process.env.ENVIRONMENT === readENV(options.baseRootEnv)
 ``` 
 
 #### Access to env
-Once `ex-env` script (xenvExample/** ) was executed before application, you gain access to `./env`
+Once `x-env-es` script (xenvExample/** ) was executed before application, you gain access to `./env`
 root variables using `process.env`, or `readENV(...)`.
 
 
@@ -166,7 +166,7 @@ HOST=http://0.0.0.0:12345
 
 
 ## Contact
-Have questions, or would like to submit feedback [contact eaglex.net](https://eaglex.net/app/contact?product=ex-env)
+Have questions, or would like to submit feedback [contact eaglex.net](https://eaglex.net/app/contact?product=x-env-es)
 
 
 
