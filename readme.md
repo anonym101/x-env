@@ -23,16 +23,17 @@ To setup pre process script called before our application, we run an npm script.
 
 NPM example :
 ```js
- //  Execution script at: ./xenvExample
+ //  Execution script at: ./app.example
  // ...package.json
   "scripts": {
-    "example:env:dev": "rimraf ./.env && node -r dotenv/config ./xenvExample dotenv_config_path=./xenvExample/envs/dev.env",
-    "example:env:prod": "rimraf ./.env && node -r dotenv/config ./xenvExample dotenv_config_path=./xenvExample/envs/prod.env",
+    "app:dev": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/dev.env",
+    "app:prod": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/prod.env",
+    "app:test": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/test.env",
   }
 
-  //$ npm example:env:dev # generates new .env at project root
+  //$ npm app:dev # generates new .env at project root
 ```
-npm `example:env:dev` removes pre/existing ./.env, then executes `./xenvScript/index` following dev.env settings.
+npm `app:dev` removes pre/existing ./.env, then executes `./app.example/index` following dev.env settings.
 
 
 
@@ -58,7 +59,7 @@ const {XEnv,readENV} = require('x-env-es/cjs');
 #### Example usage
 Run initial script before application
 
-- refer to [readme](https://github.com/anonym101/x-env/blob/master/xenvExample/readme.md)
+- refer to **example** [readme](https://github.com/anonym101/x-env/blob/master/app.example/readme.md)
 
 
 
@@ -71,7 +72,7 @@ What happens here:
 
 ```js
 
-// xenvExample/** script
+// app.example/** script
 
 const {XEnv,readENV} = require('x-env-es')
 const path = require('path')
@@ -111,22 +112,46 @@ const xEnv = new XEnv(options,DEBUG)
 // can optionally set environment type, otherwise detected based on package.json script setting
 if(!xEnv.buildEnv(/** DEVELOPMENT */)) throw('environment build failed')
  
-
-// read .env file in current/live environment  
 console.log(readENV(/*options.baseRootEnv*/))
-console.log('true === ',process.env.ENVIRONMENT === readENV(/*options.baseRootEnv*/).ENVIRONMENT)
+console.log('true === ',
+            (process.env.ENVIRONMENT === readENV().ENVIRONMENT) && 
+            readENV().ENVIRONMENT === process.env.NODE_ENV)
+       
+
+// -------------
+// continue with application in the current process
+// load above script before application starts
+
 
 ``` 
 
+
+
+*app.example/index.js*
+```js
+
+require('./app.example/XENV'); // process.env updated
+require('./app.example') // application now has access
+
+```
+
+&nbsp;
+
+
 #### Access to env
-Once `x-env-es` script (xenvExample/** ) was executed before application, you gain access to `./env`
+Once `x-env-es` script (app.example/** ) was executed before application, you gain access to `./env`
 root variables using `process.env`, or `readENV(...)`.
 
 &nbsp;
 
 #### ENVIRONMENTS
 Typical environment structure.
-Xenv requires minimum of ENVIRONMENT property to be set, all other variables must have *consistent* names
+Xenv requires minimum of ENVIRONMENT property to be set, all other variables must have *consistent* property names
+
+* Available `ENVIRONMENT` name standards:
+  * **DEVELOPMENT**: DEV, dev, develop, DEVELOP, DEVELOPMENT, development,
+  * **PRODUCTION**: PROD, prod, PRODUCTION, production,
+  * **TEST**: TEST, test, TESTING, testing
 
 
 *dev.env*
@@ -135,7 +160,7 @@ Xenv requires minimum of ENVIRONMENT property to be set, all other variables mus
 # initial data
 IP=::1
 PORT=5000
-ENVIRONMENT=DEVELOPMENT
+ENVIRONMENT=DEV
 # host api server url
 HOST=http://localhost:${PORT}
 ```
@@ -147,7 +172,7 @@ HOST=http://localhost:${PORT}
 # initial data
 IP=0.0.0.0
 PORT=12345
-ENVIRONMENT=PRODUCTION
+ENVIRONMENT=PROD
 # host api server url
 HOST=http://${IP}:${PORT}
 ```
@@ -160,7 +185,7 @@ When current environment is in PRODUCTION *.env* root file would transpile to:
 # .env
 IP=0.0.0.0
 PORT=12345
-ENVIRONMENT=PRODUCTION
+ENVIRONMENT=PROD
 HOST=http://0.0.0.0:12345
 ```
 

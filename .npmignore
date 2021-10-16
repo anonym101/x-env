@@ -12,6 +12,7 @@ jsdoc.json
 jest.config.json
 __tests__
 assets
+ideas.md
 jest.config.json
 .jsdoc.json
 package.production.json

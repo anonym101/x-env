@@ -1,0 +1,1 @@
+"use strict";exports.__esModule=!0,exports.ENV_NAME_CONVENTIONS=void 0;var ENV_NAME_CONVENTIONS={DEVELOPMENT:["DEV","dev","develop","DEVELOP","DEVELOPMENT","development"],PRODUCTION:["PROD","prod","PRODUCTION","production"],TEST:["TEST","test","TESTING","testing"]};exports.ENV_NAME_CONVENTIONS=ENV_NAME_CONVENTIONS;

@@ -4,36 +4,71 @@
  * @module x-env-es
  * @license MIT
  * {@link https://eaglex.net Eaglex}
- *
  * @author Developed by Anon
  * @version ^1.x.x
  */
 
 import { copyFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { config } from 'dotenv'
-import { readENV, makeEnvFormat } from './utils'
+import { config as dotEnvConfig } from 'dotenv'
+import { readENV, makeEnvFormat, pathToBaseRootEnv, matchEnv, xenvConfig } from './utils'
 import variableExpansion from 'dotenv-expand'
 import { EnvFile, EnvFileType, ENVIRONMENT, XCONFIG, XENV } from '@interface'
 import { onerror, isFalsy, log } from 'x-utils-es/umd'
 
 class XEnv {
     checkEnvPass = false
-    config: XCONFIG
+    config: XCONFIG & { baseRootEnv?: string }
     debug: boolean
 
     /**
      * Build env file based on package.json configuration
      * @param {boolean} debug Display useful messages, errors always show
      */
-    constructor(config: XCONFIG, debug:boolean = false) {
+    constructor(config: XCONFIG, debug: boolean = false) {
         this.debug = debug
         if (isFalsy(config)) throw new Error('Config not provided')
         if (!config.envDir) throw new Error('Must provide {envDir} full path')
-        if (!config.baseRootEnv) throw new Error('Must provide {baseRootEnv} full path')
+
+        if (!config.baseRootEnv) config.baseRootEnv = pathToBaseRootEnv()
 
         if (!config.envFileTypes.includes('dev.env') || !config.envFileTypes.includes('prod.env')) throw new Error('Must at least include: dev.env and prod.env')
+
         this.config = config
+
+        // load and assing initial process values first
+        this.loadConfigFile()
+        if(!this.validateEnvName()) throw 'process.env.ENVIRONMENT is not set in your {name}.env file'
+        
+        // and now process.env.ENVIRONMENT should be available
+
+    }
+
+
+    /** Check if provided {ENVIRONMENT} name matches our available standards, as per {ENV_NAME_CONVENTIONS} */
+    validateEnvName():boolean{
+        if(!this.ENVIRONMENT) {
+            if(this.debug) onerror('[XEnv]','process.env.ENVIRONMENT not set in your {name}.env') 
+            return false
+        }
+        else return true
+    }
+
+    /**
+     * grab cli process.args
+     * loads initial environment so we can compare with process.env.ENVORONMENT
+     *
+     * @memberof XEnv
+     */
+    loadConfigFile(): void {
+        try {
+            const options = xenvConfig(process.argv)
+            if (options.path) dotEnvConfig({ path: options.path })
+            else throw 'xenv_config_path to your {name}.env was not set at preflight'
+        } catch (err: any) {
+            if (this.debug) onerror('[XEnv][xenvConfig]', err.toString())
+            throw `Issue loading with dotenv/config`
+        }
     }
 
     /**
@@ -45,8 +80,12 @@ class XEnv {
             return false
         }
         const envNameConfirmed = this.setNewEnvConfig(envName as any)
-        if (envNameConfirmed) return this.copyRenameToLocation(envNameConfirmed)
-        else return false
+        if (envNameConfirmed) {
+            return this.copyRenameToLocation(envNameConfirmed)
+        } else {
+            if (this.debug) onerror('[XEnv]', 'Environment name not set')
+            return false
+        }
     }
 
     /**
@@ -58,6 +97,17 @@ class XEnv {
             ...(this.config.envFileTypes.includes('dev.env') ? { ['dev.env']: join(this.config.envDir, `./dev.env`) } : {}),
             ...(this.config.envFileTypes.includes('prod.env') ? { ['prod.env']: join(this.config.envDir, `./prod.env`) } : {}),
         }
+    }
+
+    /**
+     *Check for either process.env.ENVIRONMENT or process.env.NODE_ENV
+     *
+     * @readonly
+     * @type {string}
+     * @memberof XEnv
+     */
+    get ENVIRONMENT(): ENVIRONMENT {
+        return matchEnv((process.env.ENVIRONMENT || process.env.NODE_ENV) as string) as ENVIRONMENT
     }
 
     /**
@@ -75,7 +125,7 @@ class XEnv {
             }
 
             if (selected) {
-                if (data.ENVIRONMENT === process.env.ENVIRONMENT) return data
+                if (matchEnv(data.ENVIRONMENT) === this.ENVIRONMENT) return data
             } else return data
         }
 
@@ -89,13 +139,15 @@ class XEnv {
      * Set dotenv config based on .env.ENVIRONMENT settings in package.json for your desired environment to perform our new .env builds
      * @param {*} envName Build choice name, does not reflect name per your .env file
      */
-    setNewEnvConfig(envName: ENVIRONMENT): ENVIRONMENT {
+    setNewEnvConfig(envName?: ENVIRONMENT): ENVIRONMENT {
         /**
          * - Check if dev.env and prod.env exist in {envDir}
          * - Check consistency, each file should include same property names
-         * - Check to see if {name}.env for each available file has {ENVIRONMENT} set, and compares with process.env.ENVIRONMENT
+         * - Check to see if {name}.env for each available file has {ENVIRONMENT} set, and compares with (process.env.ENVIRONMENT || process.env.NODE_ENV)
          * - Finally re-process process.env config base on {.env.ENVIRONMENT} file selection
          */
+
+        envName = matchEnv(envName as any)
 
         let configSetFor: any
         if (!this.checkEnvPass) {
@@ -104,29 +156,35 @@ class XEnv {
             return undefined as any
         }
 
-        if (!process.env.ENVIRONMENT) {
-            if (this.debug) onerror('[XEnv]', 'process.env.ENVIRONMENT is not set ?')
+        if (!this.ENVIRONMENT) {
+            if (this.debug) onerror('[XEnv]', 'ENVIRONMENT is not set ?')
             return undefined as any
         }
 
         // base on selected environment perform dotenv.config() update
-         // @ts-ignore
-        const ENVIRONMENT = process.env.ENVIRONMENT
         this.environments(true)
+
             .filter((env) => (envName && env ? envName === env.ENVIRONMENT : !!env))
             .forEach((env) => {
                 if (!env) return
                 if (configSetFor) return
 
-                const fileData = env.ENVIRONMENT
-                if (fileData === ENVIRONMENT) {
+                const matcheEnv = matchEnv(env.ENVIRONMENT)
 
+                if (matcheEnv === this.ENVIRONMENT) {
                     const fileName =
-                       // @ts-ignore
-                        env.ENVIRONMENT === 'TEST' ? 'test.env' : env.ENVIRONMENT === 'DEVELOPMENT' ? 'dev.env' : env.ENVIRONMENT === 'PRODUCTION' ? 'prod.env' : undefined
+                        // @ts-ignore
+                        matcheEnv === 'TEST' ? 'test.env' : matcheEnv === 'DEVELOPMENT' ? 'dev.env' : matcheEnv === 'PRODUCTION' ? 'prod.env' : undefined
                     if (fileName) {
                         // run dotenv config
-                        config({ path: join(this.config.envDir, `./${fileName}`) })
+                        dotEnvConfig({ path: join(this.config.envDir, `./${fileName}`) })
+
+                        // NOTE
+                        // Update NODE_ENV common variable,
+                        // we can use either: process.env.ENVIRONMENT or process.env.NODE_ENV
+                        process.env.NODE_ENV = env.ENVIRONMENT
+                        // -- end
+
                         configSetFor = env.ENVIRONMENT
                     }
                 }
@@ -148,6 +206,8 @@ class XEnv {
 
         const rootEnvFilePath = baseRootEnv
         destPath = rootEnvFilePath
+        envName = matchEnv(envName)
+
         if (envName === 'TEST' && this.envFile['test.env']) sourcePath = this.envFile['test.env']
         if (envName === 'DEVELOPMENT' && this.envFile['dev.env']) sourcePath = this.envFile['dev.env']
         if (envName === 'PRODUCTION' && this.envFile['prod.env']) sourcePath = this.envFile['prod.env']
@@ -161,9 +221,11 @@ class XEnv {
             // copy new file at root
             copyFileSync(sourcePath, destPath)
 
-            //
             const selectedEnv = this.environments(true)[0]
+
+            // not needed cleanup
             delete selectedEnv.type
+            delete (selectedEnv as any).NODE_ENV
 
             // once copied, we parse the file data
             const data = variableExpansion({ parsed: selectedEnv as any })
@@ -171,10 +233,7 @@ class XEnv {
                 // convert parsed data back to .env format
                 const envData = makeEnvFormat(data.parsed)
                 if (envData) writeFileSync(baseRootEnv, envData)
-
-                if (envName === 'TEST') log('{TEST} environment set')
-                if (envName === 'DEVELOPMENT') log('{DEVELOPMENT} environment set')
-                if (envName === 'PRODUCTION') log('{PRODUCTION} environment set')
+                log(`{${envName}} environment set`)
             } else {
                 throw data.error
             }
@@ -193,6 +252,14 @@ class XEnv {
     checkEnvFileConsistency(): boolean {
         try {
             const envList = this.environments()
+
+            // must have {ENVIRONMENT} VARIABLE
+            const envsset = envList.filter((n) => n.ENVIRONMENT !== undefined).length === 3
+            if (!envsset) {
+                if (this.debug) onerror('[XEnv]', 'One of your {name}.env is missing {ENVIRONMENT} property')
+                return false
+            }
+
             this.checkEnvPass = false
             const testFileKeys = this.envFile['test.env'] ? Object.keys(envList.filter((n) => n.type === 'test.env')[0] || {}) : []
             const devFileKeys = Object.keys(envList.filter((n) => n.type === 'dev.env')[0] || {})

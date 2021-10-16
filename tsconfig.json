@@ -2,6 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {
     "allowJs": true,
+    "experimentalDecorators": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "module": "ES6",
@@ -39,7 +40,7 @@
     "./index"
   ],
   "exclude": [
-    "xenvExample",
+    "app.example",
     "node_modules",
     "dist",
     "esm"
