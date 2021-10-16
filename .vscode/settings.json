@@ -138,7 +138,15 @@
         "titleBar.inactiveForeground": "#e7e7e799",
         "statusBar.background": "#215732",
         "statusBarItem.hoverBackground": "#2f7c47",
-        "statusBar.foreground": "#e7e7e7"
+        "statusBar.foreground": "#e7e7e7",
+        "activityBar.activeBackground": "#2f7c47",
+        "activityBar.activeBorder": "#422c74",
+        "editorGroup.border": "#2f7c47",
+        "panel.border": "#2f7c47",
+        "sash.hoverBorder": "#2f7c47",
+        "sideBar.border": "#2f7c47",
+        "statusBarItem.remoteBackground": "#215732",
+        "statusBarItem.remoteForeground": "#e7e7e7"
     },
     "commentAnchors.workspace.enabled": true,
     "commentAnchors.tagHighlights.enabled": true,
@@ -160,4 +168,5 @@
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "peacock.color": "#215732",
 }

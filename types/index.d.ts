@@ -5,7 +5,6 @@
 export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
 
 
-
 export interface IENV_NAME_CONVENTIONS {
     DEVELOPMENT: Array<string>
     PRODUCTION: Array<string>
@@ -47,7 +46,7 @@ export interface XCONFIG {
     /** Full path location of .env file to which current environment is copied to, usually at base of your application: ./.env
      * @optional When not supplied will try to find root .env file for you
      */
-    baseRootEnv: string
+    baseRootEnv?: string
 
     /** Dir location of files
      * @required
@@ -70,7 +69,7 @@ export class XEnv {
     /**
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
-    buildEnv(envName?: ENVIRONMENT): boolean
+    buildEnv<T extends boolean>(envName?: ENVIRONMENT): T
     // envFile: EnvFile
     // ENVIRONMENT: ENVIRONMENT
     // environments(selected?: boolean): XENV[]
@@ -84,4 +83,4 @@ export class XEnv {
  * Read current .env file as an object, already parsed
  * @param {string} envRootFilePath provide full url to the current environment
  */
-export function readENV(envRootFilePath?: string, debug?: boolean): ENV
+export function readENV<T extends ENV>(envRootFilePath?: string, debug?: boolean): T

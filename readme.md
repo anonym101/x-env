@@ -2,7 +2,7 @@
 Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env`
 
 
-#### Why use it
+### Why use it
 
 - Custom project
 - No ENVIRONMENT setup available
@@ -12,13 +12,13 @@ Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments,
 - CJS, ESM, Typescript support
 - DefinitelyTyped
 
-#### Installation
+### Installation
 
 ```sh
 $/ npm i x-env-es
 ```
 
-#### Setup
+### Setup
 To setup pre process script called before our application, we run an npm script.
 
 NPM example :
@@ -37,14 +37,14 @@ npm `app:dev` removes pre/existing ./.env, then executes `./app.example/index` f
 
 
 
-#### Support versions 
+### Support versions 
 
 Versions: Typescript, ESM, CJS _(Commonjs)_
 
 ```js
 // Typescript, use source
 import {XEnv,readENV} from 'x-env-es/src';
-// @types import {ENVIRONMENT,XCONFIG,EnvFile,EnvFileType,ENV} from 'x-env-es/src';
+// @types import {ENVIRONMENT,XCONFIG,EnvFile,EnvFileType,ENV,XENV_CLI_ARGS} from 'x-env-es/src';
 
 // ESM
 import {XEnv,readENV} from 'x-env-es';
@@ -56,7 +56,7 @@ const {XEnv,readENV} = require('x-env-es/cjs');
 ```
 
 
-#### Example usage
+### Example usage
 Run initial script before application
 
 - refer to **example** [readme](https://github.com/anonym101/x-env/blob/master/app.example/readme.md)
@@ -74,27 +74,30 @@ What happens here:
 
 // app.example/** script
 
-const {XEnv,readENV} = require('x-env-es')
+const {XEnv,readENV,XCONFIG} = require('x-env-es')
 const path = require('path')
 
-/** @type {any} */
+/** @type {XCONFIG} */
 const options = {
-    /**  Dir location of xxx.env files. 
-     * @required
+    /** 
+     * @required 
+     * Dir location of xxx.env files. 
     */
     envDir:path.join(__dirname,'./envs'),
 
     /** 
-     * Environment types in our project, support: test.env (optional), dev.env (required), prod.env (required), with consistent property names, and at least {ENVIRONMENT} set
      * @required
+     * Environment types in our project, support: test.env (optional), dev.env (required), prod.env (required), with consistent property names, and at least {ENVIRONMENT} set
      */
     envFileTypes:['dev.env','prod.env','test.env'],
 
-    /** Full path and filename, usually project root ./
-      * This file gets updated based on current environment  
-      * @required
+    /** 
+     * @optional
+     * Full path and filename, usually project root ./
+     * This file gets updated based on current environment  
+     * If not set selected automatically
     */
-    baseRootEnv: path.join(__dirname,'../.env')
+   // baseRootEnv: path.join(__dirname,'../.env')
 }
 
 // Our class constructor
@@ -122,7 +125,6 @@ console.log('true === ',
 // continue with application in the current process
 // load above script before application starts
 
-
 ``` 
 
 
@@ -138,15 +140,15 @@ require('./app.example') // application now has access
 &nbsp;
 
 
-#### Access to env
+### Access to env
 Once `x-env-es` script (app.example/** ) was executed before application, you gain access to `./env`
 root variables using `process.env`, or `readENV(...)`.
 
 &nbsp;
 
-#### ENVIRONMENTS
+### ENVIRONMENTS
 Typical environment structure.
-Xenv requires minimum of ENVIRONMENT property to be set, all other variables must have *consistent* property names
+XEnv requires minimum of ENVIRONMENT property to be set, all other variables must have *consistent* property names
 
 * Available `ENVIRONMENT` name standards:
   * **DEVELOPMENT**: DEV, dev, develop, DEVELOP, DEVELOPMENT, development,
@@ -157,10 +159,11 @@ Xenv requires minimum of ENVIRONMENT property to be set, all other variables mus
 *dev.env*
 ```sh
 # dev.env
-# initial data
+ENVIRONMENT=DEV
+# example data
 IP=::1
 PORT=5000
-ENVIRONMENT=DEV
+
 # host api server url
 HOST=http://localhost:${PORT}
 ```
@@ -169,10 +172,10 @@ HOST=http://localhost:${PORT}
 *prod.env*
 ```sh
 # prod.env
-# initial data
+ENVIRONMENT=PROD
+# example data
 IP=0.0.0.0
 PORT=12345
-ENVIRONMENT=PROD
 # host api server url
 HOST=http://${IP}:${PORT}
 ```
@@ -182,7 +185,7 @@ When current environment is in PRODUCTION *.env* root file would transpile to:
 
 *.env*
 ```sh
-# .env
+# from file: prod.env
 IP=0.0.0.0
 PORT=12345
 ENVIRONMENT=PROD

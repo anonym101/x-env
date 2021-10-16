@@ -7,10 +7,10 @@ import { ENV_NAME_CONVENTIONS } from './data';
 
 
 /** 
- * Implementation to parse process.args and process.argv options so we can use Xenv options
+ * Implementation to parse process.args and process.argv options so we can use XEnv options
  * We are to expect {path} 
 */
-export function xenvConfig(argv: string[]): XENV_CLI_ARGS {
+export function xEnvConfig(argv: string[]): XENV_CLI_ARGS {
     const regx = /^xenv_config_(path)=(.+)$/
     const argEnvs = (_args:Array<any>): XENV_CLI_ARGS => {
         return _args.reduce((n, val)=> {
@@ -21,7 +21,7 @@ export function xenvConfig(argv: string[]): XENV_CLI_ARGS {
     }
     const args = argEnvs(argv)
     if(args.path){
-        // assing full path so we can resolve it
+        // assign full path so we can resolve it
         const pth = path.isAbsolute(args.path) ?  args.path : path.resolve(process.cwd(), args.path)
         args.path = pth
     }
@@ -30,7 +30,7 @@ export function xenvConfig(argv: string[]): XENV_CLI_ARGS {
 
 /** 
  *
- * Match to current NODE_ENV/ENTIRONMENT by comparison  */
+ * Match to current NODE_ENV/ENVIRONMENT by comparison  */
 export const matchEnv = (NODE_ENV: string): ENVIRONMENT => {
     if (!NODE_ENV) return undefined as any
     return Object.entries(ENV_NAME_CONVENTIONS).reduce((n, [k, val]) => {
@@ -56,7 +56,7 @@ export const pathToBaseRootEnv=(pth=''):string=>{
 * Read current .env file as an object, already parsed
 * @param {string} envRootFilePath defaults to root .env, or provide full url to current .env
 */
-export const readENV = (envRootFilePath?: string, debug = false): ENV | undefined => {
+export  function readENV(envRootFilePath?: string, debug = false): ENV | undefined {
 
     envRootFilePath = pathToBaseRootEnv(envRootFilePath)
    
@@ -71,9 +71,10 @@ export const readENV = (envRootFilePath?: string, debug = false): ENV | undefine
 /**
  * Convert .env parsed data back to .env file readable format
  */
-export const makeEnvFormat = (parsed: object): string | undefined => {
+export function makeEnvFormat(parsed: object,msg:string): string | undefined {
     if (!parsed) return undefined
     if (parsed) {
+        const prepend = msg
         const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
                 n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`
@@ -81,7 +82,7 @@ export const makeEnvFormat = (parsed: object): string | undefined => {
             return n
         }, '')
         if (!envData) return undefined
-        else return envData
+        else return envData ? prepend ? `# ${prepend}\n`+envData:envData:envData
     }
 }
 

@@ -17,7 +17,7 @@ const options = {
 
     /** Full path and filename, usually project root ./
       * This file gets updated based on current environment  
-      * If not set selected automaticly
+      * If not set selected automatically
       * @optional
     */
     //baseRootEnv: path.join(__dirname,'../../.env')
@@ -48,7 +48,3 @@ console.log('true === ',
 // continue with application in the current process
 // load above script before application starts
 
-
-//--------- *app.js*
-// require('./xenvExample'); // process.env loaded
-// require('app.js') // application now has access

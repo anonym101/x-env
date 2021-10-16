@@ -1,7 +1,7 @@
 import { readSingle } from 'read-env-file';
 import path from 'path';
 import { ENV_NAME_CONVENTIONS } from './data';
-export function xenvConfig(argv) {
+export function xEnvConfig(argv) {
     const regx = /^xenv_config_(path)=(.+)$/;
     const argEnvs = (_args) => {
         return _args.reduce((n, val) => {
@@ -34,7 +34,7 @@ export const pathToBaseRootEnv = (pth = '') => {
     pth = pth || path.resolve(process.cwd(), '.env');
     return path.isAbsolute(pth) ? pth : path.resolve(process.cwd(), pth);
 };
-export const readENV = (envRootFilePath, debug = false) => {
+export function readENV(envRootFilePath, debug = false) {
     envRootFilePath = pathToBaseRootEnv(envRootFilePath);
     try {
         return readSingle.sync(envRootFilePath);
@@ -44,11 +44,12 @@ export const readENV = (envRootFilePath, debug = false) => {
             console.error(err.toString());
     }
     return undefined;
-};
-export const makeEnvFormat = (parsed) => {
+}
+export function makeEnvFormat(parsed, msg) {
     if (!parsed)
         return undefined;
     if (parsed) {
+        const prepend = msg;
         const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
                 n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`;
@@ -58,6 +59,6 @@ export const makeEnvFormat = (parsed) => {
         if (!envData)
             return undefined;
         else
-            return envData;
+            return envData ? prepend ? `# ${prepend}\n` + envData : envData : envData;
     }
-};
+}

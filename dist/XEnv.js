@@ -1,7 +1,7 @@
 import { copyFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { config as dotEnvConfig } from 'dotenv';
-import { readENV, makeEnvFormat, pathToBaseRootEnv, matchEnv, xenvConfig } from './utils';
+import { readENV, makeEnvFormat, pathToBaseRootEnv, matchEnv, xEnvConfig } from './utils';
 import variableExpansion from 'dotenv-expand';
 import { onerror, isFalsy, log } from 'x-utils-es/umd';
 class XEnv {
@@ -19,12 +19,10 @@ class XEnv {
         this.config = config;
         this.loadConfigFile();
         if (!this.validateEnvName())
-            throw 'process.env.ENVIRONMENT is not set in your {name}.env file';
+            throw 'process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions';
     }
     validateEnvName() {
         if (!this.ENVIRONMENT) {
-            if (this.debug)
-                onerror('[XEnv]', 'process.env.ENVIRONMENT not set in your {name}.env');
             return false;
         }
         else
@@ -32,7 +30,7 @@ class XEnv {
     }
     loadConfigFile() {
         try {
-            const options = xenvConfig(process.argv);
+            const options = xEnvConfig(process.argv);
             if (options.path)
                 dotEnvConfig({ path: options.path });
             else
@@ -40,7 +38,7 @@ class XEnv {
         }
         catch (err) {
             if (this.debug)
-                onerror('[XEnv][xenvConfig]', err.toString());
+                onerror('[XEnv][xEnvConfig]', err.toString());
             throw `Issue loading with dotenv/config`;
         }
     }
@@ -74,6 +72,8 @@ class XEnv {
             if (selected) {
                 if (matchEnv(data.ENVIRONMENT) === this.ENVIRONMENT)
                     return data;
+                else
+                    return undefined;
             }
             else
                 return data;
@@ -101,9 +101,9 @@ class XEnv {
                 return;
             if (configSetFor)
                 return;
-            const matcheEnv = matchEnv(env.ENVIRONMENT);
-            if (matcheEnv === this.ENVIRONMENT) {
-                const fileName = matcheEnv === 'TEST' ? 'test.env' : matcheEnv === 'DEVELOPMENT' ? 'dev.env' : matcheEnv === 'PRODUCTION' ? 'prod.env' : undefined;
+            const mEnv = matchEnv(env.ENVIRONMENT);
+            if (mEnv === this.ENVIRONMENT) {
+                const fileName = mEnv === 'TEST' ? 'test.env' : mEnv === 'DEVELOPMENT' ? 'dev.env' : mEnv === 'PRODUCTION' ? 'prod.env' : undefined;
                 if (fileName) {
                     dotEnvConfig({ path: join(this.config.envDir, `./${fileName}`) });
                     process.env.NODE_ENV = env.ENVIRONMENT;
@@ -133,14 +133,16 @@ class XEnv {
         try {
             copyFileSync(sourcePath, destPath);
             const selectedEnv = this.environments(true)[0];
+            let prependMsg = selectedEnv.type ? 'from file: ' + selectedEnv.type : '';
             delete selectedEnv.type;
             delete selectedEnv.NODE_ENV;
             const data = variableExpansion({ parsed: selectedEnv });
             if (data.parsed) {
-                const envData = makeEnvFormat(data.parsed);
+                const envData = makeEnvFormat(data.parsed, prependMsg);
                 if (envData)
-                    writeFileSync(baseRootEnv, envData);
-                log(`{${envName}} environment set`);
+                    writeFileSync(baseRootEnv, envData, { encoding: 'utf8' });
+                if (this.debug)
+                    log('[XEnv]', `{${envName}} environment set`);
             }
             else {
                 throw data.error;
@@ -154,14 +156,14 @@ class XEnv {
     }
     checkEnvFileConsistency() {
         try {
+            this.checkEnvPass = false;
             const envList = this.environments();
-            const envsset = envList.filter((n) => n.ENVIRONMENT !== undefined).length === 3;
-            if (!envsset) {
+            const envsSet = envList.filter((n) => n.ENVIRONMENT !== undefined).length === 3;
+            if (!envsSet) {
                 if (this.debug)
                     onerror('[XEnv]', 'One of your {name}.env is missing {ENVIRONMENT} property');
                 return false;
             }
-            this.checkEnvPass = false;
             const testFileKeys = this.envFile['test.env'] ? Object.keys(envList.filter((n) => n.type === 'test.env')[0] || {}) : [];
             const devFileKeys = Object.keys(envList.filter((n) => n.type === 'dev.env')[0] || {});
             const prodFileKeys = Object.keys(envList.filter((n) => n.type === 'prod.env')[0] || {});

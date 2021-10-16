@@ -1,6 +1,6 @@
 {
   "name": "x-env-es",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Project (.env) environment manager",
   "main": "./index.js",
   "module": "./cjs",
@@ -50,7 +50,6 @@
     "@types/node": "^16.10.9",
     "babel-eslint": "^10.1.0",
     "babel-preset-minify": "^0.5.1",
-    "esm": "^3.2.25",
     "rimraf": "^3.0.2",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
