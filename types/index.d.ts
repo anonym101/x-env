@@ -76,7 +76,7 @@ export class XEnv {
     /**
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
-    buildEnv<T extends boolean>(envName?: ENVIRONMENT): T
+    buildEnv(envName?: ENVIRONMENT): boolean
  
 }
 
@@ -92,6 +92,7 @@ export class XEnvExclusive {
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
     buildEnv(envName?: ENVIRONMENT): boolean
+    executeLoader(cli_args:XENV_CLI_ARGS):void
     envFile: EnvFile
     ENVIRONMENT: ENVIRONMENT
     environments(selected?: boolean):  XENV[]
@@ -99,7 +100,7 @@ export class XEnvExclusive {
     copyRenameToLocation(envName: ENVIRONMENT): boolean
     checkEnvFileConsistency(): boolean
     loadConfigFile(execType?: ExecType):void
-    executeLoader(cli_args:XENV_CLI_ARGS):void
+   
 }
 
 

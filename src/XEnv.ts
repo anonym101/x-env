@@ -55,6 +55,35 @@ class XEnv implements XEnvExclusive {
         // and now process.env.ENVIRONMENT should be available
     }
 
+    /**
+     * Update execProps
+     * This method is user independent, based on environment and execType and must be executed before loadConfigFile() runs in order to update execProps
+     *
+     * @param {*} cli_args Must run with xEnvConfig() to parse args
+     */
+    public executeLoader(cli_args: XENV_CLI_ARGS): void {
+        if (this.execProps) return
+        if (isFalsy(cli_args)) throw 'cli args are not set'
+        else this.execProps = cli_args
+    }
+
+    /**
+     * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
+     */
+    public buildEnv(envName?: ENVIRONMENT): boolean {
+        if (!this.checkEnvFileConsistency()) {
+            if (this.debug) onerror('[XEnv]', 'Failed consistency check!')
+            return false
+        }
+        const envNameConfirmed = this.setNewEnvConfig(envName as any)
+        if (envNameConfirmed) {
+            return this.copyRenameToLocation(envNameConfirmed)
+        } else {
+            if (this.debug) onerror('[XEnv]', 'Environment name not set')
+            return false
+        }
+    }
+
     /** Check if provided {ENVIRONMENT} name matches our available standards, as per {ENV_NAME_CONVENTIONS} */
     validateEnvName(): boolean {
         if (!this.ENVIRONMENT) {
@@ -64,22 +93,8 @@ class XEnv implements XEnvExclusive {
     }
 
     /**
-     * Update execProps
-     * This method is user independent, based on environment and execType and must be executed before loadConfigFile() runs in order to update execProps
-     *
-     * @param {*} cli_args Must run with xEnvConfig() to parse args
-     * @memberof XEnv
-     */
-    executeLoader(cli_args: XENV_CLI_ARGS): void {
-        if (isFalsy(cli_args)) throw 'cli args are not set'
-        else this.execProps = cli_args
-    }
-
-    /**
      * grab cli process.args
      * loads initial environment so we can compare with process.env.ENVIRONMENT
-     *
-     * @memberof XEnv
      */
     loadConfigFile(execType?: ExecType): void {
         // execProps are loaded by execLoader() method
@@ -125,23 +140,6 @@ class XEnv implements XEnvExclusive {
     }
 
     /**
-     * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
-     */
-    buildEnv(envName?: ENVIRONMENT): boolean {
-        if (!this.checkEnvFileConsistency()) {
-            if (this.debug) onerror('[XEnv]', 'Failed consistency check!')
-            return false
-        }
-        const envNameConfirmed = this.setNewEnvConfig(envName as any)
-        if (envNameConfirmed) {
-            return this.copyRenameToLocation(envNameConfirmed)
-        } else {
-            if (this.debug) onerror('[XEnv]', 'Environment name not set')
-            return false
-        }
-    }
-
-    /**
      * Access env file, full path
      */
     get envFile(): EnvFile {
@@ -155,8 +153,6 @@ class XEnv implements XEnvExclusive {
     /**
      *Check for either process.env.ENVIRONMENT or process.env.NODE_ENV
      *
-     * @readonly
-     * @memberof XEnv
      */
     get ENVIRONMENT(): ENVIRONMENT {
         return matchEnv((process.env.ENVIRONMENT || process.env.NODE_ENV) as string) as ENVIRONMENT
@@ -229,9 +225,8 @@ class XEnv implements XEnvExclusive {
                         // @ts-ignore
                         mEnv === 'TEST' ? 'test.env' : mEnv === 'DEVELOPMENT' ? 'dev.env' : mEnv === 'PRODUCTION' ? 'prod.env' : undefined
                     if (fileName) {
-
                         // run dotenv config
-                        dotEnvConfig(join(this.config.envDir, `./${fileName}`),this.debug)
+                        dotEnvConfig(join(this.config.envDir, `./${fileName}`), this.debug)
 
                         // NOTE
                         // Update NODE_ENV common variable,
