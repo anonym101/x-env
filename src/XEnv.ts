@@ -10,16 +10,19 @@
 
 import { copyFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { config as dotEnvConfig } from 'dotenv'
-import { readENV, makeEnvFormat, pathToBaseRootEnv, matchEnv, xEnvConfig } from './utils'
-import variableExpansion from 'dotenv-expand'
-import { EnvFile, EnvFileType, ENVIRONMENT, XCONFIG, XENV } from '@interface'
-import { onerror, isFalsy, log } from 'x-utils-es/umd'
 
-class XEnv {
+import { readENV, makeEnvFormat, pathToBaseRootEnv, matchEnv, xEnvConfig, executeTypeOptions, dotEnvConfig } from './utils'
+import variableExpansion from 'dotenv-expand'
+import { EnvFile, EnvFileType, ENVIRONMENT, ExecType, XCONFIG, XENV, XEnvExclusive, XENV_CLI_ARGS } from '@interface'
+import { onerror, isFalsy, log, includes } from 'x-utils-es/umd'
+
+class XEnv implements XEnvExclusive {
+    /** optional prop, values assigned depending on  {ExecType}*/
+    execProps: XENV_CLI_ARGS = undefined as any
     checkEnvPass = false
     config: XCONFIG & { baseRootEnv: string }
     debug: boolean
+    _defaultExecType: ExecType = 'ROBUST'
 
     /**
      * Build env file based on package.json configuration
@@ -35,22 +38,41 @@ class XEnv {
         if (!config.envFileTypes.includes('dev.env') || !config.envFileTypes.includes('prod.env')) throw new Error('Must at least include: dev.env and prod.env')
 
         this.config = config as any
+        if (!this.config.execType) this.config.execType = this._defaultExecType
+
+        // Check execType is of valid name
+        const types = ['CLI', 'ROBUST', 'DEFAULT'] as ExecType[]
+        if (!includes(this.config.execType, types)) throw `Invalid execType: ${this.config.execType}`
+
+        // ROBUST is our alpha/fallback user did not set ROBUST, no external call required
+        if (this.config.execType === 'ROBUST') {
+            this.executeLoader(xEnvConfig(process.argv))
+        }
 
         // load and assign initial process values first
-        this.loadConfigFile()
-        if(!this.validateEnvName()) throw 'process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions'
-
+        this.loadConfigFile(this.config.execType)
+        if (!this.validateEnvName()) throw 'process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions'
         // and now process.env.ENVIRONMENT should be available
     }
 
-
     /** Check if provided {ENVIRONMENT} name matches our available standards, as per {ENV_NAME_CONVENTIONS} */
-    validateEnvName():boolean{
-        if(!this.ENVIRONMENT) {
-            // if(this.debug) onerror('[XEnv]','process.env.ENVIRONMENT not set in your {name}.env, or part of valid name conventions') 
+    validateEnvName(): boolean {
+        if (!this.ENVIRONMENT) {
+            // if(this.debug) onerror('[XEnv]','process.env.ENVIRONMENT not set in your {name}.env, or part of valid name conventions')
             return false
-        }
-        else return true
+        } else return true
+    }
+
+    /**
+     * Update execProps
+     * This method is user independent, based on environment and execType and must be executed before loadConfigFile() runs in order to update execProps
+     *
+     * @param {*} cli_args Must run with xEnvConfig() to parse args
+     * @memberof XEnv
+     */
+    executeLoader(cli_args: XENV_CLI_ARGS): void {
+        if (isFalsy(cli_args)) throw 'cli args are not set'
+        else this.execProps = cli_args
     }
 
     /**
@@ -59,14 +81,46 @@ class XEnv {
      *
      * @memberof XEnv
      */
-    loadConfigFile(): void {
-        try {
-            const options = xEnvConfig(process.argv)
-            if (options.path) dotEnvConfig({ path: options.path })
-            else throw 'xenv_config_path to your {name}.env was not set at preflight'
-        } catch (err: any) {
-            if (this.debug) onerror('[XEnv][xEnvConfig]', err.toString())
-            throw `Issue loading with dotenv/config`
+    loadConfigFile(execType?: ExecType): void {
+        // execProps are loaded by execLoader() method
+        const execProps = this.execProps as XENV_CLI_ARGS & { path: string }
+        const execOptions = this.execProps ? executeTypeOptions(execType) : []
+
+        const forSwitch = (type: ExecType): boolean => {
+            let execSet = false
+            switch (type) {
+                case 'CLI': {
+                    if (!dotEnvConfig(execProps.path, this.debug)) {
+                        execSet = false
+                        if (this.debug) onerror('[XEnv]', `no path set for exec type CLI`)
+                    } else execSet = true
+
+                    break
+                }
+                case 'ROBUST': {
+                    if (!dotEnvConfig(execProps.path, this.debug)) {
+                        execSet = false
+                        if (this.debug) onerror('[XEnv]', `no path set for exec type ROBUST`)
+                    } else execSet = true
+                    break
+                }
+                default:
+                    onerror('[XEnv]', `No execute type matched: ${type}`)
+            }
+
+            return execSet
+        }
+
+        let settings_loaded = false
+        for (let inx = 0; inx < execOptions.length; inx++) {
+            if (forSwitch(execOptions[inx])) {
+                settings_loaded = true
+                break
+            }
+        }
+
+        if (!settings_loaded) {
+            throw `No Setting loaded to exec type`
         }
     }
 
@@ -102,7 +156,6 @@ class XEnv {
      *Check for either process.env.ENVIRONMENT or process.env.NODE_ENV
      *
      * @readonly
-     * @type {string}
      * @memberof XEnv
      */
     get ENVIRONMENT(): ENVIRONMENT {
@@ -176,8 +229,9 @@ class XEnv {
                         // @ts-ignore
                         mEnv === 'TEST' ? 'test.env' : mEnv === 'DEVELOPMENT' ? 'dev.env' : mEnv === 'PRODUCTION' ? 'prod.env' : undefined
                     if (fileName) {
+
                         // run dotenv config
-                        dotEnvConfig({ path: join(this.config.envDir, `./${fileName}`) })
+                        dotEnvConfig(join(this.config.envDir, `./${fileName}`),this.debug)
 
                         // NOTE
                         // Update NODE_ENV common variable,
@@ -220,9 +274,9 @@ class XEnv {
         try {
             // copy new file at root
             copyFileSync(sourcePath, destPath)
-           
+
             const selectedEnv = this.environments(true)[0]
-            let prependMsg:string = selectedEnv.type ? 'from file: '+ selectedEnv.type:''
+            let prependMsg: string = selectedEnv.type ? 'from file: ' + selectedEnv.type : ''
 
             // not needed cleanup
             delete selectedEnv.type
@@ -234,9 +288,9 @@ class XEnv {
             const data = variableExpansion({ parsed: selectedEnv as any })
             if (data.parsed) {
                 // convert parsed data back to .env format
-                const envData = makeEnvFormat(data.parsed,prependMsg)
-                if (envData) writeFileSync(baseRootEnv, envData,{encoding:'utf8'})
-                if(this.debug) log('[XEnv]',`{${envName}} environment set`)
+                const envData = makeEnvFormat(data.parsed, prependMsg)
+                if (envData) writeFileSync(baseRootEnv, envData, { encoding: 'utf8' })
+                if (this.debug) log('[XEnv]', `{${envName}} environment set`)
             } else {
                 throw data.error
             }
@@ -263,7 +317,7 @@ class XEnv {
                 if (this.debug) onerror('[XEnv]', 'One of your {name}.env is missing {ENVIRONMENT} property')
                 return false
             }
-            
+
             const testFileKeys = this.envFile['test.env'] ? Object.keys(envList.filter((n) => n.type === 'test.env')[0] || {}) : []
             const devFileKeys = Object.keys(envList.filter((n) => n.type === 'dev.env')[0] || {})
             const prodFileKeys = Object.keys(envList.filter((n) => n.type === 'prod.env')[0] || {})

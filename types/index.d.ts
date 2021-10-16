@@ -42,6 +42,11 @@ export interface EnvFile {
     'prod.env'?: string
 }
 
+export type ExecType = 
+                    'ROBUST'  // executing script with options, and using {dotenv_config_path} in node cli command
+                    | 'CLI' // executing DEV/PROD/TEST from dir without {dotenv_config_path} cli command
+                    |'DEFAULT'; // to decide
+
 export interface XCONFIG {
     /** Full path location of .env file to which current environment is copied to, usually at base of your application: ./.env
      * @optional When not supplied will try to find root .env file for you
@@ -57,12 +62,14 @@ export interface XCONFIG {
      * @required
      */
     envFileTypes: EnvFileType[]
+    /** Available execution types: ROBUST,CLI,DEFAULT */
+    execType?: ExecType
 }
 
 /**
  * Project (.env) manager for `DEVELOPMENT`, `PRODUCTION` and  `TEST` environments, used to assign `.env` file values to your `process.env*/
 export class XEnv {
-    // checkEnvPass: boolean
+
     config: XCONFIG & { baseRootEnv?: string }
     debug: boolean
     constructor(config: XCONFIG & { baseRootEnv?: string }, debug?: boolean)
@@ -70,14 +77,32 @@ export class XEnv {
      * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
      */
     buildEnv<T extends boolean>(envName?: ENVIRONMENT): T
-    // envFile: EnvFile
-    // ENVIRONMENT: ENVIRONMENT
-    // environments(selected?: boolean): XENV[]
-    // setNewEnvConfig(envName?: ENVIRONMENT): ENVIRONMENT
-    // copyRenameToLocation(envName: ENVIRONMENT): boolean
-    // checkEnvFileConsistency(): boolean
-    // loadConfigFile():void
+ 
 }
+
+/** Unhidden available methods, visible to cjs and esm module*/
+export class XEnvExclusive {
+    execProps: XENV_CLI_ARGS
+    config: XCONFIG & { baseRootEnv: string }
+    _defaultExecType: ExecType
+    checkEnvPass: boolean
+    debug: boolean
+    constructor(config: XCONFIG & { baseRootEnv?: string }, debug?: boolean)
+    /**
+     * @param {*} envName Choose which environment to look out for, if not set will be selected based selected name.env setting
+     */
+    buildEnv(envName?: ENVIRONMENT): boolean
+    envFile: EnvFile
+    ENVIRONMENT: ENVIRONMENT
+    environments(selected?: boolean):  XENV[]
+    setNewEnvConfig(envName?: ENVIRONMENT): ENVIRONMENT
+    copyRenameToLocation(envName: ENVIRONMENT): boolean
+    checkEnvFileConsistency(): boolean
+    loadConfigFile(execType?: ExecType):void
+    executeLoader(cli_args:XENV_CLI_ARGS):void
+}
+
+
 
 /**
  * Read current .env file as an object, already parsed

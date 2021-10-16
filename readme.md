@@ -55,8 +55,10 @@ const {XEnv,readENV} = require('x-env-es/cjs');
 
 ```
 
+### CLI example
 
-### Example usage
+
+### Robust example
 Run initial script before application
 
 - refer to **example** [readme](https://github.com/anonym101/x-env/blob/master/app.example/readme.md)

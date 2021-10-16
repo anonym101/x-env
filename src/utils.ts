@@ -1,10 +1,24 @@
 
 
 import { readSingle } from 'read-env-file';
-import { ENV, ENVIRONMENT, XENV_CLI_ARGS } from '@interface';
+import { ENV, ENVIRONMENT, ExecType, XENV_CLI_ARGS } from '@interface';
 import path from 'path'
 import { ENV_NAME_CONVENTIONS } from './data';
+import { config as _dotEnvConfig, DotenvConfigOutput } from 'dotenv'
+import { onerror } from 'x-utils-es/umd'
 
+/**
+ * dotenv config module wrapper 
+ */
+export const dotEnvConfig = (pth: string, _debug = false): DotenvConfigOutput => {
+    if(!pth) return undefined as any
+    try {
+        return _dotEnvConfig({ path: pth })
+    } catch (err: any) {
+        if (_debug) onerror('[XEnv][dotEnvConfig]', err.toString())
+    }
+    return undefined as any
+}
 
 /** 
  * Implementation to parse process.args and process.argv options so we can use XEnv options
@@ -40,6 +54,15 @@ export const matchEnv = (NODE_ENV: string): ENVIRONMENT => {
         }
         return n
     }, '') as ENVIRONMENT
+}
+
+
+
+/**
+ * Available option types for executing XEnv
+ */
+export const executeTypeOptions = (execType?:ExecType):ExecType[]=>{
+    return [execType==='CLI' ? 'CLI':null, execType==='ROBUST' ? 'ROBUST':null ].filter(n=>!!n) as ExecType[]
 }
 
 
