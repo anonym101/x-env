@@ -4,7 +4,7 @@ import path from 'path'
 import { ENV_NAME_CONVENTIONS, regExp_path } from './data'
 import { config as _dotEnvConfig, DotenvConfigOutput } from 'dotenv'
 import { onerror } from 'x-utils-es/umd'
-
+import {homedir} from 'os'
 /**
  * dotenv config module wrapper
  */
@@ -53,6 +53,13 @@ export const processArgs = (_args: Array<any>, regExp: RegExp): XENV_CLI_ARGS =>
         if (mch) n[mch[1]] = mch[2]
         return n
     }, {})
+}
+
+/**
+ * return path in relation to project root path
+ */
+export const projectRoot = (envPath?:string):string => {
+    return (envPath||'')[0] === '~' ? path.join(homedir(), (envPath||'').slice(1)) : envPath ||''
 }
 
 /**
@@ -111,15 +118,14 @@ export const pathToBaseRootEnv = (pth = ''): string => {
  * Read current .env file as an object, already parsed
  * @param {string} envRootFilePath defaults to root .env, or provide full url to current .env
  */
-export function readENV(envRootFilePath?: string, debug = false): ENV | undefined {
+export function readENV(envRootFilePath?: string, debug = false): ENV {
     envRootFilePath = pathToBaseRootEnv(envRootFilePath)
-
     try {
-        return readSingle.sync(envRootFilePath) as ENV | undefined
+        return readSingle.sync(envRootFilePath) as ENV
     } catch (err: any) {
         if (debug) console.error(err.toString())
     }
-    return undefined
+    return {}  as any
 }
 
 /**

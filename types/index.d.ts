@@ -5,6 +5,13 @@
 export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
 
 
+export interface CLI_SCRIPT_ARGS{
+    DEBUG?:boolean;
+    XENV_DIR:string;
+    _XENV_DIR:string;
+}
+
+
 export interface IENV_NAME_CONVENTIONS {
     DEVELOPMENT: Array<string>
     PRODUCTION: Array<string>
@@ -21,6 +28,7 @@ export interface XENV_CLI_ARGS {
     [prop: string]: string | any;
     path?:string;
     dir?:string;
+    debug?:string;
 }
 
 

@@ -15,14 +15,18 @@
   },
   "homepage": "https://github.com/anonym101/",
   "scripts": {
-    "app:dev": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/dev.env",
-    "app:prod": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/prod.env",
-    "app:test": "rimraf ./.env && node ./app.example xenv_config_path=./app.example/XENV/test.env",
+    "app:dev": "rimraf ./.env && node ./app.example xenv_path=./app.example/XENV/dev.env",
+    "app:prod": "rimraf ./.env && node ./app.example xenv_path=./app.example/XENV/prod.env",
+    "app:test": "rimraf ./.env && node ./app.example xenv_path=./app.example/XENV/test.env",
+    "dev": "node -r ./DEV",
     "build": "rimraf dist/ &&tsc --project .",
     "build:cjs": " npm run build&& babel --config-file ./cjs/.babelrc ./dist --out-dir ./cjs",
     "lint:install": "npm i tslint --save-dev",
     "lint:fix": "./node_modules/.bin/tslint  --fix -c tslint.json src/**/*",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "xenv#dev": "./DEV/cli.sh"
   },
   "keywords": [
     ".env",

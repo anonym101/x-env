@@ -135,7 +135,7 @@ class XEnv extends XEnvBase implements XEnvExclusive {
         const env = (envFileName: EnvFileType) => {
             const filePath = join(this.config.envDir, `./${envFileName}`)
 
-            let data: XENV = readENV(filePath, false) || ({} as any)
+            let data: XENV = (readENV(filePath, false) || {}) as any
             data = {
                 ...data,
                 type: envFileName,

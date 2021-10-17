@@ -2,7 +2,7 @@ import { copyFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { readENV, makeEnvFormat, matchEnv, _xEnvConfig, executeTypeOptions, dotEnvConfig, envFilePropConsistency } from '../utils';
 import variableExpansion from 'dotenv-expand';
-import { onerror, isFalsy, log, includes } from 'x-utils-es/umd';
+import { onerror, isFalsy, includes } from 'x-utils-es/umd';
 import { XEnvBase } from './base';
 class XEnv extends XEnvBase {
     constructor(config, debug) {
@@ -54,7 +54,6 @@ class XEnv extends XEnvBase {
     loadConfigFile(execType) {
         const execProps = this.execProps;
         const execOptions = this.execProps ? executeTypeOptions(execType) : [];
-        console.log('execProps', execProps);
         const forSwitch = (type) => {
             let execSet = false;
             switch (type) {
@@ -84,7 +83,6 @@ class XEnv extends XEnvBase {
             return execSet;
         };
         let settings_loaded = false;
-        console.log('execOptions', execOptions);
         for (let inx = 0; inx < execOptions.length; inx++) {
             if (forSwitch(execOptions[inx])) {
                 settings_loaded = true;
@@ -99,7 +97,7 @@ class XEnv extends XEnvBase {
     environments(selected = false) {
         const env = (envFileName) => {
             const filePath = join(this.config.envDir, `./${envFileName}`);
-            let data = readENV(filePath, false) || {};
+            let data = (readENV(filePath, false) || {});
             data = Object.assign(Object.assign({}, data), { type: envFileName });
             if (selected) {
                 if (matchEnv(data.ENVIRONMENT) === this.ENVIRONMENT)
@@ -172,8 +170,6 @@ class XEnv extends XEnvBase {
                 const envData = makeEnvFormat(data.parsed, prependMsg);
                 if (envData)
                     writeFileSync(baseRootEnv, envData, { encoding: 'utf8' });
-                if (this.debug)
-                    log('[XEnv]', `{${envName}} environment set`);
             }
             else {
                 throw data.error;
@@ -221,4 +217,4 @@ class XEnv extends XEnvBase {
     }
 }
 export { XEnv };
-export { readENV, _xEnvConfig };
+export { readENV };

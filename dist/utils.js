@@ -3,6 +3,7 @@ import path from 'path';
 import { ENV_NAME_CONVENTIONS, regExp_path } from './data';
 import { config as _dotEnvConfig } from 'dotenv';
 import { onerror } from 'x-utils-es/umd';
+import { homedir } from 'os';
 export const dotEnvConfig = (pth, _debug = false) => {
     if (!pth)
         return undefined;
@@ -20,15 +21,15 @@ export const envFilePropConsistency = (list) => {
         let pass = 0;
         for (let inx = 0; inx < all.length; inx++) {
             let each = all[inx];
-            if (envKeys.filter(x => each.filter(y => x === y).length).length === envKeys.length) {
+            if (envKeys.filter((x) => each.filter((y) => x === y).length).length === envKeys.length) {
                 pass++;
             }
         }
         return all.length === pass;
     };
-    return list.filter((env, inx, all) => {
-        return propCheck(Object.keys(env), all.map(x => Object.keys(x)));
-    }).length === list.length;
+    return (list.filter((env, inx, all) => {
+        return propCheck(Object.keys(env), all.map((x) => Object.keys(x)));
+    }).length === list.length);
 };
 export const processArgs = (_args, regExp) => {
     return _args.reduce((n, val) => {
@@ -38,15 +39,14 @@ export const processArgs = (_args, regExp) => {
         return n;
     }, {});
 };
+export const projectRoot = (envPath) => {
+    return (envPath || '')[0] === '~' ? path.join(homedir(), (envPath || '').slice(1)) : envPath || '';
+};
 export function _xEnvConfig(argv, regExp = regExp_path) {
     const args = processArgs(argv, regExp);
     if (args.path) {
         const pth = path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path);
         args.path = pth;
-    }
-    if (args.dir) {
-        const dir = path.isAbsolute(args.dir) ? args.dir : path.resolve(process.cwd(), args.dir);
-        args.dir = dir;
     }
     return Object.assign({}, args, {});
 }
@@ -63,7 +63,7 @@ export const matchEnv = (NODE_ENV) => {
     }, '');
 };
 export const executeTypeOptions = (execType) => {
-    return [execType === 'CLI' ? 'CLI' : null, execType === 'ROBUST' ? 'ROBUST' : null].filter(n => !!n);
+    return [execType === 'CLI' ? 'CLI' : null, execType === 'ROBUST' ? 'ROBUST' : null].filter((n) => !!n);
 };
 export const pathToBaseRootEnv = (pth = '') => {
     pth = pth || path.resolve(process.cwd(), '.env');
@@ -78,7 +78,7 @@ export function readENV(envRootFilePath, debug = false) {
         if (debug)
             console.error(err.toString());
     }
-    return undefined;
+    return {};
 }
 export function makeEnvFormat(parsed, msg) {
     if (!parsed)
@@ -87,13 +87,13 @@ export function makeEnvFormat(parsed, msg) {
         const prepend = msg;
         const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
-                n = (n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`);
+                n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`;
             }
             return n;
         }, '');
         if (!envData)
             return undefined;
         else
-            return envData ? prepend ? `# ${prepend}\n` + envData : envData : envData;
+            return envData ? (prepend ? `# ${prepend}\n` + envData : envData) : envData;
     }
 }
