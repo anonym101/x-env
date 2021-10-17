@@ -1,6 +1,6 @@
 import { matchEnv, pathToBaseRootEnv } from './../utils'
 import { EnvFile, ENVIRONMENT, ExecType, XCONFIG, XENV_CLI_ARGS } from '@interface'
-import { includes, isFalsy,onerror } from 'x-utils-es/umd'
+import { includes, isFalsy, onerror } from 'x-utils-es/umd'
 import { join } from 'path'
 
 export abstract class XEnvBase {
@@ -18,20 +18,19 @@ export abstract class XEnvBase {
         this.debug = debug
 
         if (isFalsy(config)) {
-            onerror('[XEnv]','Config not provided')
-             process.exit(0)
-         
+            onerror('[XEnv]', 'Config not provided')
+            process.exit(0)
         }
         if (!config.envDir) {
-            onerror('[XEnv]','Must provide {envDir} full path')
+            onerror('[XEnv]', 'Must provide {envDir} full path')
             process.exit(0)
         }
 
         if (!config.baseRootEnv) config.baseRootEnv = pathToBaseRootEnv()
 
         if (!config.envFileTypes.includes('dev.env') || !config.envFileTypes.includes('prod.env')) {
-            onerror('[XEnv]','Must at least include: dev.env and prod.env')
-             process.exit(0)
+            onerror('[XEnv]', 'Must at least include: dev.env and prod.env')
+            process.exit(0)
         }
 
         this.config = config as any
@@ -40,7 +39,7 @@ export abstract class XEnvBase {
         // Check execType is of valid name
         const types = ['CLI', 'ROBUST', 'DEFAULT'] as ExecType[]
         if (!includes(this.config.execType, types)) {
-            onerror('[XEnv]',`Invalid execType: ${this.config.execType}`)
+            onerror('[XEnv]', `Invalid execType: ${this.config.execType}`)
             process.exit(0)
         }
     }

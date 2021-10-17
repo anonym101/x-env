@@ -6,6 +6,8 @@
  * Load env files by detecting XENV/ dir at root of project, if no XENV detected can also provide `xenv_config_dir` to to XENV location
 */
 
+// TODO add debug so we can get printout
+
 const { regExp_dir } = require('../cjs/data')
 const { onerror,log} = require('x-utils-es/umd')
 const { processArgs } = require('../cjs/utils')
@@ -69,6 +71,12 @@ xEnv.executeLoader({ path: path.join(XENV_DIR, './dev.env') })
 
 // check build is ok
 if (!xEnv.buildEnv(/** DEV */)) throw ('environment build failed')
+
+
+
+//------------------------------------------------------
+// ------------------------- app script, etc...
+// we are good to go
 
 log(readENV(/*options.baseRootEnv*/))
 log('true === ',
