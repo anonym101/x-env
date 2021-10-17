@@ -10,23 +10,32 @@ class XEnv extends XEnvBase {
         if (this.config.execType === 'ROBUST') {
             this.executeLoader(_xEnvConfig(process.argv));
         }
-        this.loadConfigFile(this.config.execType);
-        if (!this.validateEnvName()) {
-            const msg = `process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`;
-            if (this.debug)
-                onerror('[XEnv]', msg);
-            throw msg;
+        if (this.config.execType === 'ROBUST') {
+            this.loadConfigFile(this.config.execType);
+            if (!this.validateEnvName()) {
+                onerror('[XEnv]', `process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`);
+                process.exit(0);
+            }
         }
     }
     executeLoader(cli_args) {
         if (this.execProps)
             return;
-        if (isFalsy(cli_args))
-            throw 'cli args are not set';
+        if (isFalsy(cli_args)) {
+            onerror('[XEnv]', 'cli args are not set');
+            process.exit(0);
+        }
         else
             this.execProps = cli_args;
     }
     buildEnv(envName) {
+        if (this.config.execType !== 'ROBUST') {
+            this.loadConfigFile(this.config.execType);
+            if (!this.validateEnvName()) {
+                onerror('[XEnv]', `process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`);
+                process.exit(0);
+            }
+        }
         if (!this.checkEnvFileConsistency()) {
             if (this.debug)
                 onerror('[XEnv]', 'Failed consistency check!');
@@ -45,6 +54,7 @@ class XEnv extends XEnvBase {
     loadConfigFile(execType) {
         const execProps = this.execProps;
         const execOptions = this.execProps ? executeTypeOptions(execType) : [];
+        console.log('execProps', execProps);
         const forSwitch = (type) => {
             let execSet = false;
             switch (type) {
@@ -74,6 +84,7 @@ class XEnv extends XEnvBase {
             return execSet;
         };
         let settings_loaded = false;
+        console.log('execOptions', execOptions);
         for (let inx = 0; inx < execOptions.length; inx++) {
             if (forSwitch(execOptions[inx])) {
                 settings_loaded = true;
@@ -81,7 +92,8 @@ class XEnv extends XEnvBase {
             }
         }
         if (!settings_loaded) {
-            throw `No Setting loaded to exec type`;
+            onerror('[XEnv]', `No Setting loaded to exec type`);
+            process.exit(0);
         }
     }
     environments(selected = false) {
@@ -146,9 +158,8 @@ class XEnv extends XEnvBase {
         if (envName === 'PRODUCTION' && this.envFile['prod.env'])
             sourcePath = this.envFile['prod.env'];
         if (!sourcePath) {
-            if (this.debug)
-                onerror('[XEnv]', `Wrong envName: ${envName}`);
-            throw new Error(`Wrong envName:${envName}`);
+            onerror('[XEnv]', `Wrong envName: ${envName}`);
+            process.exit(0);
         }
         try {
             copyFileSync(sourcePath, destPath);
@@ -178,11 +189,13 @@ class XEnv extends XEnvBase {
         try {
             this.checkEnvPass = false;
             const envList = this.environments();
-            const validFileConditions = envList.filter(n => {
+            const validFileConditions = envList.filter((n) => {
                 let types = ['dev.env', 'prod.env', 'test.env'];
                 return n.ENVIRONMENT && includes(n.type, types);
             });
-            const mustHaveEnvironment = validFileConditions.length ? validFileConditions.length === 3 && this.config.envFileTypes.includes('test.env') : validFileConditions.length === 2;
+            const mustHaveEnvironment = validFileConditions.length
+                ? validFileConditions.length === 3 && this.config.envFileTypes.includes('test.env')
+                : validFileConditions.length === 2;
             if (!mustHaveEnvironment) {
                 if (this.debug)
                     onerror('[XEnv]', 'one of your {name}.env files is missing or {ENVIRONMENT} prop is not set');

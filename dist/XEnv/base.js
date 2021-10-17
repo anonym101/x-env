@@ -1,5 +1,5 @@
 import { matchEnv, pathToBaseRootEnv } from './../utils';
-import { includes, isFalsy } from 'x-utils-es/umd';
+import { includes, isFalsy, onerror } from 'x-utils-es/umd';
 import { join } from 'path';
 export class XEnvBase {
     constructor(config, debug = false) {
@@ -7,20 +7,28 @@ export class XEnvBase {
         this.checkEnvPass = false;
         this._defaultExecType = 'ROBUST';
         this.debug = debug;
-        if (isFalsy(config))
-            throw new Error('Config not provided');
-        if (!config.envDir)
-            throw new Error('Must provide {envDir} full path');
+        if (isFalsy(config)) {
+            onerror('[XEnv]', 'Config not provided');
+            process.exit(0);
+        }
+        if (!config.envDir) {
+            onerror('[XEnv]', 'Must provide {envDir} full path');
+            process.exit(0);
+        }
         if (!config.baseRootEnv)
             config.baseRootEnv = pathToBaseRootEnv();
-        if (!config.envFileTypes.includes('dev.env') || !config.envFileTypes.includes('prod.env'))
-            throw new Error('Must at least include: dev.env and prod.env');
+        if (!config.envFileTypes.includes('dev.env') || !config.envFileTypes.includes('prod.env')) {
+            onerror('[XEnv]', 'Must at least include: dev.env and prod.env');
+            process.exit(0);
+        }
         this.config = config;
         if (!this.config.execType)
             this.config.execType = this._defaultExecType;
         const types = ['CLI', 'ROBUST', 'DEFAULT'];
-        if (!includes(this.config.execType, types))
-            throw `Invalid execType: ${this.config.execType}`;
+        if (!includes(this.config.execType, types)) {
+            onerror('[XEnv]', `Invalid execType: ${this.config.execType}`);
+            process.exit(0);
+        }
     }
     get ENVIRONMENT() {
         return matchEnv((process.env.ENVIRONMENT || process.env.NODE_ENV));
