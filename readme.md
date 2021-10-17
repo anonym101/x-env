@@ -103,7 +103,7 @@ const options = {
 }
 
 // Our class constructor
-const DEBUG = true
+const DEBUG = true // show meaningful messages
 const xEnv = new XEnv(options,DEBUG)
 
 

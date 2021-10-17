@@ -1,7 +1,7 @@
 
 
 import { readSingle } from 'read-env-file';
-import { ENV, ENVIRONMENT, ExecType, XENV_CLI_ARGS } from '@interface';
+import { ENV, EnvFileType, ENVIRONMENT, ExecType, XENV_CLI_ARGS, XENV } from '@interface';
 import path from 'path'
 import { ENV_NAME_CONVENTIONS } from './data';
 import { config as _dotEnvConfig, DotenvConfigOutput } from 'dotenv'
@@ -20,12 +20,35 @@ export const dotEnvConfig = (pth: string, _debug = false): DotenvConfigOutput =>
     return undefined as any
 }
 
+/** Make sure all {name}.env files have consistent prop names */
+export const envFilePropConsistency = (list:XENV[]):boolean=>{
+
+    /** props must match for both sides */
+    const propCheck = (envKeys:string[],all:string[][]):boolean=>{
+        
+        let pass = 0
+        for (let inx = 0; inx< all.length;inx++){
+            let each = all[inx]
+            if(envKeys.filter(x=> each.filter(y=>x===y).length).length===envKeys.length ){
+                pass++
+            }
+        }
+
+        return all.length  === pass
+    }
+
+   return list.filter((env,inx, all)=>{
+        return propCheck(Object.keys(env), all.map(x=>Object.keys(x)))
+    }).length === list.length
+}
+
+
 /** 
  * Implementation to parse process.args and process.argv options so we can use XEnv options
  * We are to expect {path} 
 */
 export function xEnvConfig(argv: string[]): XENV_CLI_ARGS {
-    const regx = /^xenv_config_(path)=(.+)$/
+    const regx = /^xenv_config_(path)=(.+)$/;
     const argEnvs = (_args:Array<any>): XENV_CLI_ARGS => {
         return _args.reduce((n, val)=> {
             const mch = val.match(regx)
@@ -36,7 +59,7 @@ export function xEnvConfig(argv: string[]): XENV_CLI_ARGS {
     const args = argEnvs(argv)
     if(args.path){
         // assign full path so we can resolve it
-        const pth = path.isAbsolute(args.path) ?  args.path : path.resolve(process.cwd(), args.path)
+        const pth = (path.isAbsolute(args.path) ?  args.path : path.resolve(process.cwd(), args.path));
         args.path = pth
     }
     return Object.assign({}, args, {}) as any
@@ -79,7 +102,7 @@ export const pathToBaseRootEnv=(pth=''):string=>{
 * Read current .env file as an object, already parsed
 * @param {string} envRootFilePath defaults to root .env, or provide full url to current .env
 */
-export  function readENV(envRootFilePath?: string, debug = false): ENV | undefined {
+export function readENV(envRootFilePath?: string, debug = false): ENV | undefined {
 
     envRootFilePath = pathToBaseRootEnv(envRootFilePath)
    
@@ -100,7 +123,7 @@ export function makeEnvFormat(parsed: object,msg:string): string | undefined {
         const prepend = msg
         const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
-                n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`
+                n = (n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`);
             }
             return n
         }, '')

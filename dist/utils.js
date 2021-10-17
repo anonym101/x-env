@@ -1,6 +1,35 @@
 import { readSingle } from 'read-env-file';
 import path from 'path';
 import { ENV_NAME_CONVENTIONS } from './data';
+import { config as _dotEnvConfig } from 'dotenv';
+import { onerror } from 'x-utils-es/umd';
+export const dotEnvConfig = (pth, _debug = false) => {
+    if (!pth)
+        return undefined;
+    try {
+        return _dotEnvConfig({ path: pth });
+    }
+    catch (err) {
+        if (_debug)
+            onerror('[XEnv][dotEnvConfig]', err.toString());
+    }
+    return undefined;
+};
+export const envFilePropConsistency = (list) => {
+    const propCheck = (envKeys, all) => {
+        let pass = 0;
+        for (let inx = 0; inx < all.length; inx++) {
+            let each = all[inx];
+            if (envKeys.filter(x => each.filter(y => x === y).length).length === envKeys.length) {
+                pass++;
+            }
+        }
+        return all.length === pass;
+    };
+    return list.filter((env, inx, all) => {
+        return propCheck(Object.keys(env), all.map(x => Object.keys(x)));
+    }).length === list.length;
+};
 export function xEnvConfig(argv) {
     const regx = /^xenv_config_(path)=(.+)$/;
     const argEnvs = (_args) => {
@@ -13,7 +42,7 @@ export function xEnvConfig(argv) {
     };
     const args = argEnvs(argv);
     if (args.path) {
-        const pth = path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path);
+        const pth = (path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path));
         args.path = pth;
     }
     return Object.assign({}, args, {});
@@ -29,6 +58,9 @@ export const matchEnv = (NODE_ENV) => {
         }
         return n;
     }, '');
+};
+export const executeTypeOptions = (execType) => {
+    return [execType === 'CLI' ? 'CLI' : null, execType === 'ROBUST' ? 'ROBUST' : null].filter(n => !!n);
 };
 export const pathToBaseRootEnv = (pth = '') => {
     pth = pth || path.resolve(process.cwd(), '.env');
@@ -52,7 +84,7 @@ export function makeEnvFormat(parsed, msg) {
         const prepend = msg;
         const envData = Object.entries(parsed || {}).reduce((n, [k, val]) => {
             if (parsed[k] !== undefined) {
-                n = n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`;
+                n = (n ? n + `${k}=${val.toString()}\n` : `${k}=${val.toString()}\n`);
             }
             return n;
         }, '');

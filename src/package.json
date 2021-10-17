@@ -1,6 +1,6 @@
 {
     "name": "x-env",
-    "main": "./XEnv.ts",
+    "main": "./XEnv",
     "esm": {
         "mode": "auto"
     }

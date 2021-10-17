@@ -97,7 +97,7 @@ export class XEnvExclusive {
     ENVIRONMENT: ENVIRONMENT
     environments(selected?: boolean):  XENV[]
     setNewEnvConfig(envName?: ENVIRONMENT): ENVIRONMENT
-    copyRenameToLocation(envName: ENVIRONMENT): boolean
+    makeENVFile(envName: ENVIRONMENT): boolean
     checkEnvFileConsistency(): boolean
     loadConfigFile(execType?: ExecType):void
    

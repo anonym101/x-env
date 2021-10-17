@@ -36,8 +36,7 @@
     "es2018"
   ],
   "include": [
-    "src",
-    "./index"
+    "src"
   ],
   "exclude": [
     "app.example",
