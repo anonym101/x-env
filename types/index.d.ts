@@ -19,7 +19,8 @@ export interface ENV {
 
 export interface XENV_CLI_ARGS {
     [prop: string]: string | any;
-    path?:string
+    path?:string;
+    dir?:string;
 }
 
 
@@ -109,4 +110,11 @@ export class XEnvExclusive {
  * Read current .env file as an object, already parsed
  * @param {string} envRootFilePath provide full url to the current environment
  */
-export function readENV<T extends ENV>(envRootFilePath?: string, debug?: boolean): T
+export function readENV(envRootFilePath?: string, debug?: boolean):ENV
+
+/**
+ * Transform cli params to readable object
+ * @param {*} argv process.argv params
+ * @param {*} regExp {dir,path} are supported based on RegExp expressions
+ */
+export function _xEnvConfig(argv: string[], regExp:RegExp ): XENV_CLI_ARGS 

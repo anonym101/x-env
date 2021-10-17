@@ -1,6 +1,6 @@
 import { readSingle } from 'read-env-file';
 import path from 'path';
-import { ENV_NAME_CONVENTIONS } from './data';
+import { ENV_NAME_CONVENTIONS, regExp_path } from './data';
 import { config as _dotEnvConfig } from 'dotenv';
 import { onerror } from 'x-utils-es/umd';
 export const dotEnvConfig = (pth, _debug = false) => {
@@ -30,20 +30,23 @@ export const envFilePropConsistency = (list) => {
         return propCheck(Object.keys(env), all.map(x => Object.keys(x)));
     }).length === list.length;
 };
-export function xEnvConfig(argv) {
-    const regx = /^xenv_config_(path)=(.+)$/;
-    const argEnvs = (_args) => {
-        return _args.reduce((n, val) => {
-            const mch = val.match(regx);
-            if (mch)
-                n[mch[1]] = mch[2];
-            return n;
-        }, {});
-    };
-    const args = argEnvs(argv);
+export const processArgs = (_args, regExp) => {
+    return _args.reduce((n, val) => {
+        const mch = val.match(regExp);
+        if (mch)
+            n[mch[1]] = mch[2];
+        return n;
+    }, {});
+};
+export function _xEnvConfig(argv, regExp = regExp_path) {
+    const args = processArgs(argv, regExp);
     if (args.path) {
-        const pth = (path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path));
+        const pth = path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path);
         args.path = pth;
+    }
+    if (args.dir) {
+        const dir = path.isAbsolute(args.dir) ? args.dir : path.resolve(process.cwd(), args.dir);
+        args.dir = dir;
     }
     return Object.assign({}, args, {});
 }

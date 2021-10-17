@@ -39,6 +39,9 @@
     "src"
   ],
   "exclude": [
+    "DEV",
+    "PROD",
+    "TEST",
     "app.example",
     "node_modules",
     "dist",

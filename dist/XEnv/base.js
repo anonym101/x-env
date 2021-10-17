@@ -1,5 +1,6 @@
-import { pathToBaseRootEnv } from './../utils';
+import { matchEnv, pathToBaseRootEnv } from './../utils';
 import { includes, isFalsy } from 'x-utils-es/umd';
+import { join } from 'path';
 export class XEnvBase {
     constructor(config, debug = false) {
         this.execProps = undefined;
@@ -20,5 +21,18 @@ export class XEnvBase {
         const types = ['CLI', 'ROBUST', 'DEFAULT'];
         if (!includes(this.config.execType, types))
             throw `Invalid execType: ${this.config.execType}`;
+    }
+    get ENVIRONMENT() {
+        return matchEnv((process.env.ENVIRONMENT || process.env.NODE_ENV));
+    }
+    get envFile() {
+        return Object.assign(Object.assign(Object.assign({}, (this.config.envFileTypes.includes('test.env') ? { ['test.env']: join(this.config.envDir, `./test.env`) } : {})), (this.config.envFileTypes.includes('dev.env') ? { ['dev.env']: join(this.config.envDir, `./dev.env`) } : {})), (this.config.envFileTypes.includes('prod.env') ? { ['prod.env']: join(this.config.envDir, `./prod.env`) } : {}));
+    }
+    validateEnvName() {
+        if (!this.ENVIRONMENT) {
+            return false;
+        }
+        else
+            return true;
     }
 }

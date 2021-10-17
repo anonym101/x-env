@@ -1,6 +1,6 @@
 import { copyFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { readENV, makeEnvFormat, matchEnv, xEnvConfig, executeTypeOptions, dotEnvConfig, envFilePropConsistency } from '../utils';
+import { readENV, makeEnvFormat, matchEnv, _xEnvConfig, executeTypeOptions, dotEnvConfig, envFilePropConsistency } from '../utils';
 import variableExpansion from 'dotenv-expand';
 import { onerror, isFalsy, log, includes } from 'x-utils-es/umd';
 import { XEnvBase } from './base';
@@ -8,11 +8,15 @@ class XEnv extends XEnvBase {
     constructor(config, debug) {
         super(config, debug);
         if (this.config.execType === 'ROBUST') {
-            this.executeLoader(xEnvConfig(process.argv));
+            this.executeLoader(_xEnvConfig(process.argv));
         }
         this.loadConfigFile(this.config.execType);
-        if (!this.validateEnvName())
-            throw 'process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions';
+        if (!this.validateEnvName()) {
+            const msg = `process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`;
+            if (this.debug)
+                onerror('[XEnv]', msg);
+            throw msg;
+        }
     }
     executeLoader(cli_args) {
         if (this.execProps)
@@ -37,13 +41,6 @@ class XEnv extends XEnvBase {
                 onerror('[XEnv]', 'Environment name not set');
             return false;
         }
-    }
-    validateEnvName() {
-        if (!this.ENVIRONMENT) {
-            return false;
-        }
-        else
-            return true;
     }
     loadConfigFile(execType) {
         const execProps = this.execProps;
@@ -86,12 +83,6 @@ class XEnv extends XEnvBase {
         if (!settings_loaded) {
             throw `No Setting loaded to exec type`;
         }
-    }
-    get envFile() {
-        return Object.assign(Object.assign(Object.assign({}, (this.config.envFileTypes.includes('test.env') ? { ['test.env']: join(this.config.envDir, `./test.env`) } : {})), (this.config.envFileTypes.includes('dev.env') ? { ['dev.env']: join(this.config.envDir, `./dev.env`) } : {})), (this.config.envFileTypes.includes('prod.env') ? { ['prod.env']: join(this.config.envDir, `./prod.env`) } : {}));
-    }
-    get ENVIRONMENT() {
-        return matchEnv((process.env.ENVIRONMENT || process.env.NODE_ENV));
     }
     environments(selected = false) {
         const env = (envFileName) => {
@@ -217,4 +208,4 @@ class XEnv extends XEnvBase {
     }
 }
 export { XEnv };
-export { readENV };
+export { readENV, _xEnvConfig };

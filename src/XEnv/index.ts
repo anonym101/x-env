@@ -11,7 +11,7 @@
  import { copyFileSync, writeFileSync } from 'fs'
  import { join } from 'path'
  
- import { readENV, makeEnvFormat, matchEnv, xEnvConfig, executeTypeOptions, dotEnvConfig, envFilePropConsistency } from '../utils'
+ import { readENV, makeEnvFormat, matchEnv, _xEnvConfig, executeTypeOptions, dotEnvConfig, envFilePropConsistency } from '../utils'
  import variableExpansion from 'dotenv-expand'
  import { EnvFileType, ENVIRONMENT, ExecType, XCONFIG, XENV, XEnvExclusive, XENV_CLI_ARGS } from '@interface'
  import { onerror, isFalsy, log, includes } from 'x-utils-es/umd'
@@ -24,15 +24,14 @@ import { XEnvBase } from './base'
 
          //NOTE  ROBUST is our alpha/fallback user did not set ROBUST, no external call required
          if (this.config.execType === 'ROBUST') {
-             this.executeLoader(xEnvConfig(process.argv))
+             this.executeLoader(_xEnvConfig(process.argv))
          }
  
          // load and assign initial process values first
          this.loadConfigFile(this.config.execType)
          if (!this.validateEnvName()) {
-             const msg = `process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`
-             if(this.debug) onerror('[XEnv]',msg)
-             throw msg
+             onerror('[XEnv]',`process.env.ENVIRONMENT is not set in your {name}.env file, or part of valid name conventions`)
+             process.exit(0)  
          }
 
          //NOTE and now process.env.ENVIRONMENT should be available
@@ -42,11 +41,14 @@ import { XEnvBase } from './base'
       * Update execProps
       * This method is user independent, based on environment and execType and must be executed before loadConfigFile() runs in order to update execProps
       *
-      * @param {*} cli_args Must run with xEnvConfig() to parse args
+      * @param {*} cli_args Must run with _xEnvConfig() to parse args
       */
      public executeLoader(cli_args: XENV_CLI_ARGS): void {
          if (this.execProps) return
-         if (isFalsy(cli_args)) throw 'cli args are not set'
+         if (isFalsy(cli_args)) {
+             onerror('[XEnv]','cli args are not set')
+             process.exit(0)        
+         }
          else this.execProps = cli_args
      }
  
@@ -66,7 +68,6 @@ import { XEnvBase } from './base'
              return false
          }
      }
- 
     
      /**
       * grab cli process.args
@@ -111,7 +112,9 @@ import { XEnvBase } from './base'
          }
  
          if (!settings_loaded) {
-             throw `No Setting loaded to exec type`
+            onerror('[XEnv]', `No Setting loaded to exec type`)
+             process.exit(0)
+
          }
      }
  
@@ -219,8 +222,8 @@ import { XEnvBase } from './base'
          if (envName === 'PRODUCTION' && this.envFile['prod.env']) sourcePath = this.envFile['prod.env']
  
          if (!sourcePath) {
-             if (this.debug) onerror('[XEnv]', `Wrong envName: ${envName}`)
-             throw new Error(`Wrong envName:${envName}`)
+             onerror('[XEnv]', `Wrong envName: ${envName}`)
+             process.exit(0)
          }
  
          try {
@@ -287,7 +290,7 @@ import { XEnvBase } from './base'
                  return false
              }
  
-               // NOTE  if ok we are safe to call methods: setXEnvConfig() > makeENVFile()
+               // NOTE  if ok we are safe to call methods: set_xEnvConfig() > makeENVFile()
              this.checkEnvPass = true
  
              return true
@@ -299,5 +302,5 @@ import { XEnvBase } from './base'
  }
  
  export { XEnv }
- export { readENV }
+ export { readENV,_xEnvConfig }
  

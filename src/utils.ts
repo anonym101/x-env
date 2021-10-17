@@ -1,9 +1,9 @@
 
 
 import { readSingle } from 'read-env-file';
-import { ENV, EnvFileType, ENVIRONMENT, ExecType, XENV_CLI_ARGS, XENV } from '@interface';
+import { ENV, ENVIRONMENT, ExecType, XENV_CLI_ARGS, XENV } from '@interface';
 import path from 'path'
-import { ENV_NAME_CONVENTIONS } from './data';
+import { ENV_NAME_CONVENTIONS, regExp_path } from './data';
 import { config as _dotEnvConfig, DotenvConfigOutput } from 'dotenv'
 import { onerror } from 'x-utils-es/umd'
 
@@ -43,25 +43,39 @@ export const envFilePropConsistency = (list:XENV[]):boolean=>{
 }
 
 
+/** Process cli arguments 
+ * @param {*} _args cli args
+ * @param {*} regExp 
+*/
+ export const processArgs = (_args: Array<any>, regExp: RegExp): XENV_CLI_ARGS => {
+     return _args.reduce((n, val) => {
+         const mch = val.match(regExp)
+         if (mch) n[mch[1]] = mch[2]
+         return n
+     }, {})
+ }
+
+
 /** 
  * Implementation to parse process.args and process.argv options so we can use XEnv options
  * We are to expect {path} 
+ * @param {*} regExp {dir,path} are supported based on RegExp expressions
 */
-export function xEnvConfig(argv: string[]): XENV_CLI_ARGS {
-    const regx = /^xenv_config_(path)=(.+)$/;
-    const argEnvs = (_args:Array<any>): XENV_CLI_ARGS => {
-        return _args.reduce((n, val)=> {
-            const mch = val.match(regx)
-            if (mch) n[mch[1]] = mch[2]
-            return n
-        }, {})
-    }
-    const args = argEnvs(argv)
-    if(args.path){
+export function _xEnvConfig(argv: string[], regExp: RegExp = regExp_path): XENV_CLI_ARGS {
+
+    const args = processArgs(argv,regExp)
+    if (args.path) {
         // assign full path so we can resolve it
-        const pth = (path.isAbsolute(args.path) ?  args.path : path.resolve(process.cwd(), args.path));
+        const pth = path.isAbsolute(args.path) ? args.path : path.resolve(process.cwd(), args.path)
         args.path = pth
     }
+
+    if (args.dir) {
+        // assign full path so we can resolve it
+        const dir = path.isAbsolute(args.dir) ? args.dir : path.resolve(process.cwd(), args.dir)
+        args.dir = dir
+    }
+
     return Object.assign({}, args, {}) as any
 }
 
