@@ -54,7 +54,7 @@ export interface EnvFile {
 export type ExecType = 
                     'ROBUST'  // executing script with options, and using {dotenv_config_path} in node cli command
                     | 'CLI' // executing DEV/PROD/TEST from dir without {dotenv_config_path} cli command
-                    |'DEFAULT'; // to decide
+                   // |'DEFAULT'; // to decide
 
 export interface XCONFIG {
     /** Full path location of .env file to which current environment is copied to, usually at base of your application: ./.env

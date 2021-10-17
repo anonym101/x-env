@@ -1,4 +1,3 @@
-'use strict';
 import { default_xenv_dir_name, regExp } from '../data';
 import { onerror, log } from 'x-utils-es/umd';
 import { processArgs, projectRoot } from '../utils';
@@ -11,9 +10,17 @@ export const CLI_PRE_PROCESS = () => {
         XENV_DIR: '',
         _XENV_DIR: '',
     };
+    const parseJson = (debug) => {
+        try {
+            return JSON.parse(debug || '') || false;
+        }
+        catch (err) {
+        }
+        return false;
+    };
     const root = process.cwd();
     const argv = processArgs(process.argv, regExp);
-    CLI.DEBUG = JSON.parse(argv.debug || '') || false;
+    CLI.DEBUG = parseJson(argv.debug);
     CLI.XENV_DIR = projectRoot(argv.dir);
     if (CLI.XENV_DIR) {
         CLI._XENV_DIR = join(root, CLI.XENV_DIR);

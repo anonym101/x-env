@@ -21,8 +21,9 @@ export abstract class XEnvBase {
             onerror('[XEnv]', 'Config not provided')
             process.exit(0)
         }
+        
         if (!config.envDir) {
-            onerror('[XEnv]', 'Must provide {envDir} full path')
+            onerror('[XEnv]', 'Must provide valid {envDir} path')
             process.exit(0)
         }
 

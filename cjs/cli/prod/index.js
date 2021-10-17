@@ -1,0 +1,1 @@
+"use strict";exports.__esModule=!0,exports["default"]=void 0;var _index=require("../index"),_default=function(){var args=(0,_index.CLI_PRE_PROCESS)();(0,_index.CLI_SCRIPT)(args,"PROD")}();exports["default"]=_default;

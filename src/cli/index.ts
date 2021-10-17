@@ -1,4 +1,3 @@
-'use strict'
 
 /**
  * Cli executable construct for ./DEV, ./PROD, and ./TEST
@@ -7,7 +6,7 @@
 
 // TODO add debug so we can get printout
 
-import { default_xenv_dir_name, regExp_dir, regExp } from '../data'
+import { default_xenv_dir_name, regExp } from '../data'
 import { onerror, log } from 'x-utils-es/umd'
 import { processArgs, projectRoot } from '../utils'
 import { XEnv, readENV } from '../XEnv'
@@ -24,14 +23,23 @@ export const CLI_PRE_PROCESS=(): CLI_SCRIPT_ARGS=> {
         _XENV_DIR: '',
     }
 
+    const parseJson = (debug)=>{
+        try{
+            return JSON.parse(debug ||'' ) || false
+        }catch(err){
+            // debug
+        }
+        return false
+    }
+
     const root = process.cwd()
     // process any args provided
     const argv: XENV_CLI_ARGS = processArgs(process.argv, regExp)
 
-    CLI.DEBUG = JSON.parse(argv.debug ||'' ) || false
+    CLI.DEBUG =  parseJson(argv.debug)
     CLI.XENV_DIR = projectRoot(argv.dir)
 
-    // NOTE Check if user supplied xenv_config_dir=, or check if {default_xenv_dir_name} already exists in project root
+    // NOTE Check if user supplied xenv_dir=, or check if {default_xenv_dir_name} already exists in project root
     if (CLI.XENV_DIR) {
         CLI._XENV_DIR = join(root, CLI.XENV_DIR)
 
