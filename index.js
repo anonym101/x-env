@@ -30,7 +30,7 @@
      }
  
      try {
-         const parsed = _dotEnvConfig({ path: envPath })
+         const parsed = dotEnvConfig({ path: envPath })
          const d = variableExpansion(parsed)
          if (d.error) throw d.error
          else return d.parsed
