@@ -12,23 +12,14 @@ export interface CLI_SCRIPT_ARGS{
 }
 
 
-export interface IENV_NAME_CONVENTIONS {
-    DEVELOPMENT: Array<string>
-    PRODUCTION: Array<string>
-    TEST: Array<string>
-}
 
 /** Each xx.env file can contain any of these props */
 export interface ENV {
     [prop: string]: number | string | boolean | null | undefined
-    ENVIRONMENT: string
 }
 
-export interface XENV_CLI_ARGS {
-    [prop: string]: string | any;
-    path?:string;
-    dir?:string;
-    debug?:string;
+export interface CLI_ARGS {
+    [prop: string]: string;
 }
 
 

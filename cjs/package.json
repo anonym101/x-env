@@ -1,7 +1,0 @@
-{
-    "name": "x-env",
-    "main": "./index.cjs",
-    "type": "commonjs",
-    "types": "../types",
-    "typings": "../types"
-}
