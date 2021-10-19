@@ -8,7 +8,7 @@
  const variableExpansion =require('dotenv-expand')
  
  /**
-  * Return parsed environment {name.env} based on process.env.NODE_ENV
+  * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
   * - NODE_ENV available values: DEVELOPMENT, PRODUCTION, TEST
   * @param {boolean} auto decide which file to load based on process.env.NODE_ENV
   * @param {string} pth
@@ -27,15 +27,15 @@
          if (NODE_ENV === 'DEVELOPMENT') envPath = `./dev.env`
          if (NODE_ENV === 'PRODUCTION') envPath = `./prod.env`
          if (NODE_ENV === 'TEST') envPath = `./test.env`
-     }
- 
+     } 
+     
      try {
          const parsed = dotEnvConfig({ path: envPath })
          const d = variableExpansion(parsed)
          if (d.error) throw d.error
          else return d.parsed
      } catch (err) {
-         console.log('[parsedEnvConfig]', err.toString())
+         console.log('[parsedEnvConfig]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
      }
      return undefined
  }
