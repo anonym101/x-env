@@ -1,5 +1,5 @@
 
 
-console.log('script', process.env.ENVIRONMENT, process.env.NODE_ENV)
-
+console.log('GREETING', process.env.GREETING)
+console.log('NAME', process.env.NAME)
 //  node -e "try{require('./dev')}catch(e){}"
