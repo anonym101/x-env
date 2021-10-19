@@ -5,7 +5,7 @@
   "main": "./index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "cross-env NODE_ENV=DEVELOPMENT1 node example",
+    "start": "cross-env NODE_ENV=DEVELOPMENT node example",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engineStrict": true,

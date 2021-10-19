@@ -11,3 +11,19 @@
     "start:test": "cross-env NODE_ENV=TEST node example",
   },
 ```
+
+
+### Example
+
+```js
+// based on cross-env NODE_ENV=...
+// auto detect
+console.log(parsedEnvConfig())
+
+
+// each manually, ignores current process.env.NODE_ENV
+const auto = false
+console.log(parsedEnvConfig(auto,'./dev.env')) // parse dev.env values to process.env{...}
+console.log(parsedEnvConfig(auto,'./prod.env')) // parse prod.env values to process.env{...}
+console.log(parsedEnvConfig(auto,'./test.env')) // parse prod.test values to process.env{...}
+```
