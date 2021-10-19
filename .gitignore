@@ -2,9 +2,8 @@ node_modules
 npm-debug.log
 info.md 
 # Local development
-
 /.env
-*.dev
+
 .DS_Store
 docs
 coverage
@@ -13,7 +12,6 @@ old
 todo
 todo.md
 ideas.md
-example.js
 # Docker
 Dockerfile
 docker-compose.yml
