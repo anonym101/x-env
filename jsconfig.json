@@ -1,0 +1,25 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "emitDeclarationOnly":true,
+    "typeRoots": [
+      "node_modules/@types/node"
+    ],
+    "declaration": true,
+    "sourceMap": false,
+    "checkJs":true,
+    "esModuleInterop":true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "target": "ES2015", 
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true, 
+    "baseUrl": "."
+  },
+  "paths": {
+    "*": ["node_modules/*"]
+  },
+  "include": ["index"],
+  "exclude": ["node_modules"]
+}
