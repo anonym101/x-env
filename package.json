@@ -2,7 +2,7 @@
   "name": "x-env",
   "version": "1.0.0",
   "description": "Simple (.env) environment manager",
-  "main": "./xenv.js",
+  "main": "./xenv/index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node -r ./index NODE_ENV=DEVELOPMENT",
