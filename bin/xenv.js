@@ -2,7 +2,9 @@
 
 (function (){
     const xEnvConfig = require('../xenv')
-    const crossEnv = require('cross-env/src/')
-    crossEnv(process.argv.slice(2))   
-    xEnvConfig()
+    const crossEnv = require('../xenv/cross-env-alt')
+    crossEnv(process.argv.slice(2),()=>{
+        xEnvConfig()
+    })   
+   
 })()

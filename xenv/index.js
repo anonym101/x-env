@@ -20,11 +20,13 @@ const ENV_NAME_CONVENTIONS = {
 /**
  *
  * Match to current NODE_ENV/ENVIRONMENT by comparison 
- * @param {NODE_ENV} string
+ * @param {string} NODE_ENV
  * @returns {ENVIRONMENT}
  **/
 const matchEnv = (NODE_ENV) => {
     if (!NODE_ENV) return undefined
+  
+    // @ts-ignore
     return Object.entries(ENV_NAME_CONVENTIONS).reduce((n, [k, val]) => {
         if (!n) {
             /** @type {Array<string>} */
