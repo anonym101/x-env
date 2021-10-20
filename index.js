@@ -7,6 +7,9 @@
  const dotEnvConfig  = require('dotenv').config
  const variableExpansion =require('dotenv-expand')
  
+
+const matching
+
  /**
   * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
   * - NODE_ENV available values: DEVELOPMENT, PRODUCTION, TEST
@@ -15,7 +18,7 @@
   * 
   * @returns {ENV}
   */
- exports.parsedEnvConfig = (auto = true, pth) => {
+module.exports = xEnvConfig = (auto = true, pth) => {
      if (!auto && !pth) throw 'When auto not set must provide path'
  
      /** @type {ENVIRONMENT} */
