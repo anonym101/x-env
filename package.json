@@ -5,10 +5,9 @@
   "main": "./index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node ./bin/xenv.js NODE_ENV=DEVELOPMENT",
+    "start": "node -r ./index NODE_ENV=DEVELOPMENT",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "engineStrict": true,
   "engines": {
     "node": "*",
     "npm": "*"
@@ -23,10 +22,9 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
-    "read-env-file": "^2.0.3-0",
     "x-utils-es": "^2.4.0"
   },
   "bin": {
-    "xenv": "bin/xenv.js"
+    "xenv": "index.js"
   }
 }
