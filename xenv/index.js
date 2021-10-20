@@ -42,12 +42,12 @@ const matchEnv = (NODE_ENV) => {
  /**
   * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
   * - NODE_ENV available values matching ENV_NAME_CONVENTIONS[]
-  * @param {boolean} auto decide which file to load based on process.env.NODE_ENV
-  * @param {string} pth
+  * @param {boolean?} auto decide which file to load based on process.env.NODE_ENV
+  * @param {string?} pth
   * 
   * @returns {ENV}
   */
-module.exports = function xEnvConfig (auto = true, pth){
+module.exports = function xEnvConfig (auto = true, pth=''){
      if (!auto && !pth) throw 'When auto not set must provide path'
  
      /** @type {ENVIRONMENT} */
