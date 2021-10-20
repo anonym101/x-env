@@ -1,7 +1,0 @@
-{
-    "name": "x-env",
-    "main": "./XEnv/index",
-    "esm": {
-        "mode": "auto"
-    }
-}

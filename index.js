@@ -1,8 +1,10 @@
-/* @ts-nocheck */
-"use strict";
-/* eslint-disable-next-line semi */
-/* tslint:disable */
-/* eslint-disable */
-/* eslint-disable no-proto */
+#!/usr/bin/env node
 
-export * from './dist/XEnv'
+(function (){
+    const xEnvConfig = require('./xenv')
+    const crossEnv = require('cross-env/src/')
+    crossEnv(process.argv.slice(2))   
+    xEnvConfig()
+})()
+
+console.log(process.env.NODE_ENV)
