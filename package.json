@@ -9,11 +9,7 @@
   "esm": {
     "mode": "auto"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/anonym101/x-env"
-  },
-  "homepage": "https://github.com/anonym101/",
+
   "scripts": {
     "app:dev": "node ./app.example xenv_path=./app.example/XENV/dev.env",
     "app:prod": "node ./app.example xenv_path=./app.example/XENV/prod.env",
