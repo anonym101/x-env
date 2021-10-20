@@ -31,6 +31,7 @@ const matchEnv = (NODE_ENV) => {
         if (!n) {
             /** @type {Array<string>} */
             let _val = val
+            // @ts-ignore
             if (_val.filter((x) => x === NODE_ENV).length) n = k
         }
         return n
@@ -46,10 +47,11 @@ const matchEnv = (NODE_ENV) => {
   * 
   * @returns {ENV}
   */
-module.exports = xEnvConfig = (auto = true, pth) => {
+module.exports = function xEnvConfig (auto = true, pth){
      if (!auto && !pth) throw 'When auto not set must provide path'
  
      /** @type {ENVIRONMENT} */
+     // @ts-ignore
      const NODE_ENV= process.env.NODE_ENV
  
      let envPath = pth

@@ -41,10 +41,10 @@ function crossEnv(args, options = {}, cb=undefined) {
       if (crossEnvExitCode === null) {
         crossEnvExitCode = signal === 'SIGINT' ? 0 : 1
       }
-      if(typeof cb==='function') cb()
+      if(typeof cb==='function') cb() // NOTE << call our xenv script
       process.exit(crossEnvExitCode) //eslint-disable-line no-process-exit
     })
-    if(typeof cb==='function') cb()
+    if(typeof cb==='function') cb() // NOTE << call our xenv script
     return proc
   }
   return null
