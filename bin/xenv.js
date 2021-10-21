@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 (function (){
-    const xEnvConfig = require('../xenv')
+    const {config} = require('../xenv')
     const crossEnv = require('../xenv/cross-env-alt')
     crossEnv(process.argv.slice(2),()=>{
         try{
-            xEnvConfig()
+            config()
         }catch(err){
             console.error('[error]',err.toString())
         }

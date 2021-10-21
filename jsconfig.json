@@ -3,7 +3,8 @@
   "compilerOptions": {
     "emitDeclarationOnly":true,
     "typeRoots": [
-      "node_modules/@types/node"
+      "node_modules/@types/node",
+      "types"
     ],
     "declaration": true,
     "sourceMap": false,

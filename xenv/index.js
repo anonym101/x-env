@@ -47,7 +47,7 @@ const matchEnv = (NODE_ENV) => {
   * 
   * @returns {ENV}
   */
-module.exports = function xEnvConfig (auto = true, pth=''){
+exports.config = function (auto = true, pth=''){
      if (!auto && !pth) throw 'When auto not set must provide path'
  
      /** @type {ENVIRONMENT} */
@@ -68,7 +68,7 @@ module.exports = function xEnvConfig (auto = true, pth=''){
          if (d.error) throw d.error
          else return d.parsed
      } catch (err) {
-         console.log('[parsedEnvConfig]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
+         console.log('[xenv]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
      }
      return undefined
  }

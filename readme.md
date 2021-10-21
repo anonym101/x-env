@@ -1,8 +1,9 @@
-### Simple .env manager
+## Simple .env manager
+Manage your .env files by providing NODE_ENV=... environment name to cli script
 
-1. Go to `./index.js`, copy method: `parsedEnvConfig(...)` and install dependencies. 
-2. Create `dev.env`, `prod.env`, `test.env` at ./root of your project, refer to `./ENVS` for examples 
-3. Set cross-env script depending on your `NODE_ENV`
+1. Create `dev.env`, `prod.env`, `test.env` at ./root of your project, refer to `./ENVS` for examples 
+2. Set ./xenv bin executable before script entry with your `NODE_ENV` environment name
+3. Example for setting the script:
 
 ```sh
  "scripts": {
@@ -12,24 +13,44 @@
   },
 ```
 
+`NODE_ENV` convectional names:
+
+- *DEVELOPMENT*: `DEV, dev, develop, DEVELOP, DEVELOPMENT, development`
+- *PRODUCTION*: `PROD, prod, PRODUCTION, production`
+- *TEST*: `TEST, test, TESTING, testing`
+
+
+### Install
+You can install `x-env` script as npm dependency like so:
+
+```sh
+/$ npm i https://github.com/anonym101/x-env.git
+```
+
 
 ### Example
 
-Accessing `parsedEnvConfig()` method indirectly
+Accessing `xenv` indirectly
 
 ```js
+const {config} = require('x-env')
 // based on cross-env NODE_ENV=...
 // auto detect
-console.log(parsedEnvConfig())
+console.log(config())
 
 
 // each manually, ignores current process.env.NODE_ENV
 const auto = false
-console.log(parsedEnvConfig(auto,'./dev.env')) // parse dev.env values to process.env{...}
-console.log(parsedEnvConfig(auto,'./prod.env')) // parse prod.env values to process.env{...}
-console.log(parsedEnvConfig(auto,'./test.env')) // parse prod.test values to process.env{...}
+console.log(config(auto,'./dev.env')) // parse dev.env values to process.env{...}
+console.log(config(auto,'./prod.env')) // parse prod.env values to process.env{...}
+console.log(config(auto,'./test.env')) // parse prod.test values to process.env{...}
 ```
 
 
 ### About cross-env
-xenv script extends from cross-env module, for more details refer to: `https://github.com/kentcdodds/cross-env/tree/v7.0.3`
+x-env script extends from cross-env module, for more details refer to: `https://github.com/kentcdodds/cross-env/tree/v7.0.3`
+
+
+
+## Contact
+Have questions, or would like to submit feedback [contact eaglex.net](https://eaglex.net/app/contact?product=x-env)

@@ -4,6 +4,8 @@
   "description": "Simple (.env) environment manager",
   "main": "./xenv/index.js",
   "type": "commonjs",
+  "types": "./type",
+  "typings": "./type",
   "scripts": {
     "start": "node -r ./index NODE_ENV=DEVELOPMENT",
     "test": "echo \"Error: no test specified\" && exit 1"
