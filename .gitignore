@@ -8,6 +8,7 @@ proto
 docs
 coverage
 assets
+/example.js
 old
 todo
 todo.md
