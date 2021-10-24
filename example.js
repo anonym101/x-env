@@ -7,5 +7,5 @@ const {config} = require('.')
 config(false,'dev.env')
 // each manually, ignores current process.env.NODE_ENV
 // parsedEnvConfig(false,'./prod.env')
-console.log(process.env.ENVIRONMENT)
-console.log(typeof process.env.DEBUG)
+//console.log(process.env.ENVIRONMENT)
+console.log(process.env.PASS_PHRASE)

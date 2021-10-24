@@ -12,6 +12,8 @@ old
 todo
 todo.md
 ideas.md
+/prod.env
+/dev.env
 # Docker
 Dockerfile
 docker-compose.yml
