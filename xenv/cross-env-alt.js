@@ -12,13 +12,15 @@ const envSetterRegex = /(\w+)=('(.*)'|"(.*)"|(.*))/
  * our alteration to cross-env code is to add a callback for when NODE_ENV is set
  * @param {*} args 
  * @param {*} options 
- * @param {()=>void} cb 
+ * @param {{}} _envs combined preparsed envs 
  * @returns 
  */
-function crossEnv(args, options = {}, cb = undefined) {
-  let cbDone = false
+function crossEnv(args, options = {},_envs) {
+
   const [envSetters, command, commandArgs] = parseCommand(args)
-  const env = getEnvVars(envSetters)
+  const _envSetters = Object.entries(_envs).length ? _envs:envSetters
+  const env = getEnvVars(_envSetters)
+
   if (command) {
     const proc = spawn(
       // run `path.normalize` for command(on windows)
@@ -31,34 +33,11 @@ function crossEnv(args, options = {}, cb = undefined) {
         env,
       },
     )
-    process.on('SIGTERM', () => {
-      proc.kill('SIGTERM')
-      if (!cbDone) {
-        cb() // NOTE << call our xenv script
-        cbDone = true
-      }
-    })
-    process.on('SIGINT', () => {
-      proc.kill('SIGINT')
-      if (!cbDone) {
-        if (typeof cb === 'function') cb() // NOTE << call our xenv script
-        cbDone = true
-      }
-    })
-    process.on('SIGBREAK', () => {
-      proc.kill('SIGBREAK')
-      if (!cbDone) {
-        if (typeof cb === 'function') cb() // NOTE << call our xenv script
-        cbDone = true
-      }
-    })
-    process.on('SIGHUP', () => {
-      proc.kill('SIGHUP')
-      if (!cbDone) {
-        if (typeof cb === 'function') cb()
-        cbDone = true
-      }
-    })
+    process.on('SIGTERM', () => proc.kill('SIGTERM'))
+    process.on('SIGINT', () => proc.kill('SIGINT'))
+    process.on('SIGBREAK', () => proc.kill('SIGBREAK'))
+    process.on('SIGHUP', () =>proc.kill('SIGHUP'))
+
     proc.on('exit', (code, signal) => {
       let crossEnvExitCode = code
       // exit code could be null when OS kills the process(out of memory, etc) or due to node handling it
@@ -66,16 +45,9 @@ function crossEnv(args, options = {}, cb = undefined) {
       if (crossEnvExitCode === null) {
         crossEnvExitCode = signal === 'SIGINT' ? 0 : 1
       }
-      if (!cbDone) {
-        if (typeof cb === 'function') cb() // NOTE << call our xenv script
-        cbDone = true
-      }
       process.exit(crossEnvExitCode) //eslint-disable-line no-process-exit
     })
-    if (!cbDone) {
-      if (typeof cb === 'function') cb() // NOTE << call our xenv script
-      cbDone = true
-    }
+
     return proc
   }
   return null
