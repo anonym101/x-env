@@ -1,6 +1,6 @@
 /** NOTE CODE BORROWED FROM cross-env package, at version: @cross-env@^7.0.3*/
 
-const {spawn} = require('cross-spawn')
+const { spawn } = require('cross-spawn')
 const commandConvert = require('cross-env/src/command')
 const varValueConvert = require('cross-env/src/variable')
 
@@ -15,7 +15,8 @@ const envSetterRegex = /(\w+)=('(.*)'|"(.*)"|(.*))/
  * @param {()=>void} cb 
  * @returns 
  */
-function crossEnv(args, options = {}, cb=undefined) {
+function crossEnv(args, options = {}, cb = undefined) {
+  let cbDone = false
   const [envSetters, command, commandArgs] = parseCommand(args)
   const env = getEnvVars(envSetters)
   if (command) {
@@ -30,10 +31,34 @@ function crossEnv(args, options = {}, cb=undefined) {
         env,
       },
     )
-    process.on('SIGTERM', () => proc.kill('SIGTERM'))
-    process.on('SIGINT', () => proc.kill('SIGINT'))
-    process.on('SIGBREAK', () => proc.kill('SIGBREAK'))
-    process.on('SIGHUP', () => proc.kill('SIGHUP'))
+    process.on('SIGTERM', () => {
+      proc.kill('SIGTERM')
+      if (!cbDone) {
+        cb() // NOTE << call our xenv script
+        cbDone = true
+      }
+    })
+    process.on('SIGINT', () => {
+      proc.kill('SIGINT')
+      if (!cbDone) {
+        if (typeof cb === 'function') cb() // NOTE << call our xenv script
+        cbDone = true
+      }
+    })
+    process.on('SIGBREAK', () => {
+      proc.kill('SIGBREAK')
+      if (!cbDone) {
+        if (typeof cb === 'function') cb() // NOTE << call our xenv script
+        cbDone = true
+      }
+    })
+    process.on('SIGHUP', () => {
+      proc.kill('SIGHUP')
+      if (!cbDone) {
+        if (typeof cb === 'function') cb()
+        cbDone = true
+      }
+    })
     proc.on('exit', (code, signal) => {
       let crossEnvExitCode = code
       // exit code could be null when OS kills the process(out of memory, etc) or due to node handling it
@@ -41,10 +66,16 @@ function crossEnv(args, options = {}, cb=undefined) {
       if (crossEnvExitCode === null) {
         crossEnvExitCode = signal === 'SIGINT' ? 0 : 1
       }
-      if(typeof cb==='function') cb() // NOTE << call our xenv script
+      if (!cbDone) {
+        if (typeof cb === 'function') cb() // NOTE << call our xenv script
+        cbDone = true
+      }
       process.exit(crossEnvExitCode) //eslint-disable-line no-process-exit
     })
-    if(typeof cb==='function') cb() // NOTE << call our xenv script
+    if (!cbDone) {
+      if (typeof cb === 'function') cb() // NOTE << call our xenv script
+      cbDone = true
+    }
     return proc
   }
   return null
@@ -95,7 +126,7 @@ function parseCommand(args) {
 }
 
 function getEnvVars(envSetters) {
-  const envVars = {...process.env}
+  const envVars = { ...process.env }
   if (process.env.APPDATA) {
     envVars.APPDATA = process.env.APPDATA
   }
