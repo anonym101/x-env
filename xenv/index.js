@@ -43,7 +43,7 @@ const matchEnv = (NODE_ENV) => {
   * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
   * - NODE_ENV available values matching ENV_NAME_CONVENTIONS[]
   * @param {boolean?} auto decide which file to load based on process.env.NODE_ENV
-  * @param {string?} pth
+  * @param {string?} pth Optionally provide relative path to your {name}.env 
   * 
   * @returns {ENV}
   */
@@ -68,7 +68,7 @@ exports.config = function (auto = true, pth=''){
          if (d.error) throw d.error
          else return d.parsed
      } catch (err) {
-         console.log('[xenv]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
+         console.log('[xenv][config]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
      }
      return undefined
  }

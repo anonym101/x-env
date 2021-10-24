@@ -2,7 +2,7 @@
 Manage your .env files by providing NODE_ENV=... environment name to cli script
 
 1. Create `dev.env`, `prod.env`, `test.env` at ./root of your project, refer to `./ENVS` for examples 
-2. Set ./xenv bin executable before script entry with your `NODE_ENV` environment name
+2. Set ./xenv bin executable before script entry with your `NODE_ENV` environment name, *( unless your application already processes NODE_ENV using conventional names. )*
 3. Example for setting the script:
 
 ```sh
@@ -13,7 +13,7 @@ Manage your .env files by providing NODE_ENV=... environment name to cli script
   },
 ```
 
-`NODE_ENV` convectional names:
+`NODE_ENV` conventional names:
 
 - *DEVELOPMENT*: `DEV, dev, develop, DEVELOP, DEVELOPMENT, development`
 - *PRODUCTION*: `PROD, prod, PRODUCTION, production`

@@ -3,7 +3,7 @@ npm-debug.log
 info.md 
 # Local development
 /.env
-
+proto
 .DS_Store
 docs
 coverage

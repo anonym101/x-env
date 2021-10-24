@@ -7,7 +7,7 @@ declare namespace xenv {
     /**
         * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
         * - NODE_ENV available values matching ENV_NAME_CONVENTIONS[]
-        * @param {*} auto decide which file to load based on process.env.NODE_ENV
+        * @param {*} auto Decide which file to load based on process.env.NODE_ENV
         * @param {*} pth Optionally provide relative path to your {name}.env 
         * 
     */

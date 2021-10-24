@@ -1,13 +1,12 @@
 {
   "name": "x-env",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple (.env) environment manager",
   "main": "./xenv/index.js",
   "type": "commonjs",
   "types": "./type",
   "typings": "./type",
   "scripts": {
-    "start": "node -r ./index NODE_ENV=DEVELOPMENT",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -16,15 +15,12 @@
   },
   "author": "anon",
   "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^16.11.1"
-  },
   "dependencies": {
     "cross-env": "=7.0.3",
     "dotenv": "=10.0.0",
     "dotenv-expand": "=5.1.0"
   },
   "bin": {
-    "xenv": "./bin/xenv.js"
+    "xenv": "./bin/x-env.js"
   }
 }
