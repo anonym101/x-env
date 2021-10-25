@@ -11,7 +11,7 @@ declare namespace xenv {
         * @param {*} pth Optionally provide relative path to your {name}.env 
         * 
     */
-    export function config(auto?:boolean, pth?:string):ENV
+    export function configParse(auto?:boolean, pth?:string):ENV
 }
 export as namespace xenv
 export {xenv} 
