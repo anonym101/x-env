@@ -28,22 +28,45 @@ You can install `x-env` script as npm dependency like so:
 ```
 
 
-### Example
+### Examples
+
+1. **Example One**:
+
+When using npm cli command following your script:
+`  "start:dev": "node_modules/.bin/xenv NODE_ENV=DEVELOPMENT node example", `
+ will parse all` dev.env` values to process.env[...], so you dont have to invoke {configParse} method again.
+ You can use your custom method to extract desired values from `process.env`
+
+```js
+
+const exportEnvs = () => {
+    const props = ['DEBUG', 'ENVIRONMENT', 'NODE_ENV']
+    return Object.entries(process.env).reduce((n, [ k, val ]) => {
+        if (props.filter(x => k === x).length) {
+            n[k] = val
+        }
+        return n
+    }, {}) // > {DEBUG,ENVIRONMENT,NODE_ENV}
+}
+
+```
+
+2. **Example Two**:
 
 Accessing `xenv` indirectly
 
 ```js
-const {config} = require('x-env')
+const {configParse} = require('x-env')
 // based on cross-env NODE_ENV=...
 // auto detect
-console.log(config())
+console.log(configParse())
 
 
-// each manually, ignores current process.env.NODE_ENV
+// Or each manually, overrides current process.env.NODE_ENV selection
 const auto = false
-console.log(config(auto,'./dev.env')) // parse dev.env values to process.env{...}
-console.log(config(auto,'./prod.env')) // parse prod.env values to process.env{...}
-console.log(config(auto,'./test.env')) // parse prod.test values to process.env{...}
+console.log(configParse(auto,'./dev.env')) // parse dev.env values to process.env{...}
+console.log(configParse(auto,'./prod.env')) // parse prod.env values to process.env{...}
+console.log(configParse(auto,'./test.env')) // parse prod.test values to process.env{...}
 ```
 
 

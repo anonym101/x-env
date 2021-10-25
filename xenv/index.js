@@ -78,7 +78,7 @@ const matchEnv = (NODE_ENV) => {
  * 
  * @returns {ENV}
  */
-const config = function (auto = true, pth = '') {
+const configParse = function (auto = true, pth = '') {
     if (!auto && !pth) throw 'When auto not set must provide path'
 
     /** @type {ENVIRONMENT} */
@@ -100,20 +100,20 @@ const config = function (auto = true, pth = '') {
         if (d.error) throw d.error
         else return d.parsed
     } catch (err) {
-        console.log('[xenv][config]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
+        console.log('[xenv][configParse]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
     }
     return undefined
 }
 
 /**
- *  simpleParse > config() +{NODE_ENV}
+ *  simpleParse > configParse() +{NODE_ENV}
  * @returns {{}}
  */
 const combinedENVS = () => {
     try {
         if (simpleParse(process.argv)) {
             let v = {
-                ...config(),
+                ...configParse(),
                 ...(process.env.NODE_ENV ? { NODE_ENV: process.env.NODE_ENV } : {})
             }
             return v
@@ -125,6 +125,6 @@ const combinedENVS = () => {
 }
 
 exports.combinedENVS = combinedENVS
-exports.config = config
+exports.configParse = configParse
 exports.processArgs = processArgs
 exports.simpleParse = simpleParse
