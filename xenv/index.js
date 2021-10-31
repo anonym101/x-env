@@ -77,12 +77,13 @@ const configParse = function (auto = true, pth = '') {
                 console.error('process.env configuration return for xenv.config.js must be 1 level object/standard')
             }
             
+           const clean_updatedEnvs = strignifyObjectValues(updatedEnvs)
             data.parsed={
                 ...data.parsed,
-                ...strignifyObjectValues(updatedEnvs)
+                ...clean_updatedEnvs
             }
 
-            updateProcessEnvs(data.parsed)
+           if(Object.keys(clean_updatedEnvs).length) updateProcessEnvs(data.parsed)
          
         }
 
