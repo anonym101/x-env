@@ -1,9 +1,11 @@
 /** Internal utility belt */
-
+const path  = require('path')
+const os = require('os')
+const fs = require('fs') 
 const {configParse} = require('.')
 
 /**
-* 
+* @typedef {import('../types').xenv.ENV} ENV
 * @param {Array<string> } args 
 * @returns {{NODE_ENV:string}}
 */
@@ -20,6 +22,84 @@ const processArgs = function (args) {
 }
 
 /**
+ * Make all env values from xenv.config.js type string
+ * @param {{}} env 
+ */
+const strignifyObjectValues = (env)=>{
+   
+        return Object.entries(env).reduce((n,[k,val])=>{
+            try{
+                n[k]=JSON.stringify(val)
+            }catch(err){
+            }
+            return n
+        },{})
+    }
+
+/**
+ * Provided envs must be in 1 level standard 
+ * @param {{}} envs
+ * @returns {boolean}
+ */
+function envsOneLevelStandard(envs) {
+    try {
+        let n = Object.entries(envs).reduce((n, [k, val]) => {
+         
+            if (typeof val==='boolean' || typeof val==='bigint' || typeof val==='number' || !val || typeof val=='string') {
+                n[k] = val
+            }          
+            return n
+        }, {})
+
+        return Object.keys(n).length === Object.keys(envs).length
+    } catch (err) {
+        return false
+    }
+}
+
+/**
+ * Resolve Xenv cognitional/optional callback file  
+ * @param {string} envPath 
+ * @returns {(env:ENV | any)=>ENV?} return updated env 
+ */
+function xConfigSupportFile(envPath = 'xenv.config.js') {
+    if (!envPath) throw 'fileName not set?'
+
+    const testConfig = (file='')=>{
+        try{
+            return fs.readFileSync(file).toString().length >0
+        }catch(err){
+            return false
+        }
+    }
+
+    // try 2 chances
+    try {
+        let file = path.resolve(process.cwd(), envPath)
+        // first check if we have xenv.config.js available at the project root
+        if(!testConfig(file)) return undefined
+        const cb = require(file)
+
+        if (typeof cb === 'function') return cb
+        else throw (' Your xenv.config.js must return callback')
+    } catch (err) {
+        console.error('[xenv][config]', err)
+    }
+    try {
+        let file = (envPath || '')[0] === '~' ? path.join(os.homedir(), (envPath || '').slice(1)) : envPath || ''
+         // first check if we have xenv.config.js available at the project root
+        if(!testConfig(file)) return undefined
+        const cb = require(file)
+        if (typeof cb === 'function') return cb
+        else throw (' Your xenv.config.js must return callback')
+    } catch (err) {
+        console.error('[xenv][config]', err)
+    }
+    return undefined
+}
+
+
+/**
 * Parse NODE_ENV value from process.args[0]
 * @param {Array<string> } args 
 * @returns {boolean}
@@ -33,6 +113,22 @@ const simpleParse = (args) => {
     return true
 }
 
+/**
+ * Update process.envs 
+ * @param {{}} envs 
+ * @returns {void}
+ */
+const updateProcessEnvs = (envs)=>{
+    try{
+        for(let key in envs){
+            if(envs.hasOwnProperty(key)){
+                process.env[key] = envs[key]
+            }
+        }
+    }catch(err){
+        // ups
+    }
+}
 
 /**
  *  simpleParse > configParse() +{NODE_ENV}
@@ -52,5 +148,8 @@ const combinedENVS = () => {
     }
     return {}
 }
-
+exports.xConfigSupportFile = xConfigSupportFile
 exports.combinedENVS = combinedENVS
+exports.envsOneLevelStandard = envsOneLevelStandard
+exports.strignifyObjectValues = strignifyObjectValues
+exports.updateProcessEnvs = updateProcessEnvs

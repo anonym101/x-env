@@ -1,13 +1,13 @@
 
 /**
- * @typedef { 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'} ENVIRONMENT
- * @typedef {{[prop: string]: string}} ENV
- * @typedef {{[name:string]:Array<string> }} NAME_CONVENTIONS
+ * @typedef { import('../types').xenv.ENVIRONMENT} ENVIRONMENT
+ * @typedef {import('../types').xenv.ENV} ENV
+ * @typedef { import('../types').xenv.NAME_CONVENTIONS} NAME_CONVENTIONS
  */
 
 const dotEnvConfig = require('dotenv').config
 const variableExpansion = require('dotenv-expand')
-
+const {xConfigSupportFile,envsOneLevelStandard,strignifyObjectValues,updateProcessEnvs} = require('./utils')
 
 /** @type {NAME_CONVENTIONS} */
 const ENV_NAME_CONVENTIONS = {
@@ -64,8 +64,29 @@ const configParse = function (auto = true, pth = '') {
     }
 
     try {
-        const parsed = dotEnvConfig({ path: envPath })
-        const d = variableExpansion(parsed)
+        let data = dotEnvConfig({ path: envPath })
+
+        // add xenv.config.js (optional) support so we can make conditional updates based on our {name}.env configuration
+        const configSupportCB = xConfigSupportFile('xenv.config.js')
+
+        if (configSupportCB) {
+            let updatedEnvs = configSupportCB(Object.assign({},data.parsed)) || {}
+
+            if (!envsOneLevelStandard(updatedEnvs)) {
+                updatedEnvs = {}
+                console.error('process.env configuration return for xenv.config.js must be 1 level object/standard')
+            }
+            
+            data.parsed={
+                ...data.parsed,
+                ...strignifyObjectValues(updatedEnvs)
+            }
+
+            updateProcessEnvs(data.parsed)
+         
+        }
+
+        const d = variableExpansion(data) // update value prefixes, (example): localhost:${PORT} > localhost:5555
         if (d.error) throw d.error
         else return d.parsed
     } catch (err) {
