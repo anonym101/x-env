@@ -2,7 +2,6 @@
 const path  = require('path')
 const os = require('os')
 const fs = require('fs') 
-const {configParse} = require('.')
 
 /**
 * @typedef {import('../types').xenv.ENV} ENV
@@ -134,11 +133,11 @@ const updateProcessEnvs = (envs)=>{
  *  simpleParse > configParse() +{NODE_ENV}
  * @returns {{}}
  */
-const combinedENVS = () => {
+const combinedENVS = (_configParse) => {
     try {
         if (simpleParse(process.argv)) {
             let v = {
-                ...configParse(),
+                ..._configParse(),
                 ...(process.env.NODE_ENV ? { NODE_ENV: process.env.NODE_ENV } : {})
             }
             return v
