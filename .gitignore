@@ -18,7 +18,7 @@ ideas.md
 # Docker
 Dockerfile
 docker-compose.yml
-
+xenv.config.js
 package.master.json
 package.prod.json
 package.production.json
