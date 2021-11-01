@@ -28,7 +28,10 @@ const strignifyObjectValues = (env)=>{
    
         return Object.entries(env).reduce((n,[k,val])=>{
             try{
-                n[k]=JSON.stringify(val)
+                if(typeof val!=='string'){
+                    n[k]=JSON.stringify(val)
+                } else n[k] = val
+               
             }catch(err){
             }
             return n
