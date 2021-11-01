@@ -70,6 +70,25 @@ console.log(configParse(auto,'./test.env')) // parse prod.test values to process
 ```
 
 
+### Config file
+You can (optionally) add `xenv.config.js` to root of your application, where it will preflight/update your {name}.env settings.
+
+- You must provide a callback method, and return the object. 
+
+```js
+// (file) xenv.config.js
+
+module.exports = (ENVS)=>{
+
+    if(ENVS.SSL==='1') ENVS.PORT=443
+
+return ENVS; // must return single level object
+
+}
+
+```
+
+
 ### About cross-env
 x-env script extends from cross-env module, for more details refer to: `https://github.com/kentcdodds/cross-env/tree/v7.0.3`
 
