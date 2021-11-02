@@ -90,7 +90,7 @@ const configParse = function (auto = true, pth = '', loadConfigFile=false) {
         if (d.error) throw d.error
         else return d.parsed
     } catch (err) {
-        console.log('[xenv][configParse]', `ENVIRONMENT not found for: ${envPath || NODE_ENV}`)
+        console.log('[xenv][configParse]', `ENVIRONMENT not found for: ${envPath || _NODE_ENV}`)
     }
     return undefined
 }

@@ -115,16 +115,16 @@ function xConfigSupportFile(envPath = 'xenv.config.js') {
 /**
 * Parse NODE_ENV value from process.args[0]
 * @param {Array<string> } args 
-* @returns {string}
+* @returns {boolean}
 */
 const simpleParse = (args) => {
-    let assignment=''
     const _NODE_ENV = processArgs(args).NODE_ENV
     if (!_NODE_ENV) return undefined
     else {
         // fixes left-hand assignment issue with webpack
-        return assignment = process.env.NODE_ENV = _NODE_ENV
+        Object.assign(process.env,{NODE_ENV:_NODE_ENV}) 
     }
+    return true
 }
 
 /**
@@ -136,7 +136,9 @@ const updateProcessEnvs = (envs)=>{
     try{
         for(let key in envs){
             if(envs.hasOwnProperty(key)){
-                process.env[key] = envs[key]
+                //process.env[key] = envs[key]
+                // fix left-side assignment issue with webpack
+                Object.assign(process.env,{[key]:envs[key]})
             }
         }
     }catch(err){
