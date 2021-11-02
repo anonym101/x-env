@@ -7,7 +7,7 @@
 
 const dotEnvConfig = require('dotenv').config
 const variableExpansion = require('dotenv-expand')
-const {xConfigSupportFile,envsOneLevelStandard,strignifyObjectValues,updateProcessEnvs} = require('./utils')
+const {xConfigSupportFile,envsOneLevelStandard,strignifyObjectValues,updateProcessEnvs,processNODE_ENV} = require('./utils')
 
 /** @type {NAME_CONVENTIONS} */
 const ENV_NAME_CONVENTIONS = {
@@ -19,11 +19,11 @@ const ENV_NAME_CONVENTIONS = {
 /**
 *
 * Match to current NODE_ENV/ENVIRONMENT by comparison 
-* @param {string} NODE_ENV
+* @param {string} _NODE_ENV
 * @returns {ENVIRONMENT}
 **/
-const matchEnv = (NODE_ENV) => {
-    if (!NODE_ENV) return undefined
+const matchEnv = (_NODE_ENV) => {
+    if (!_NODE_ENV) return undefined
 
     // @ts-ignore
     return Object.entries(ENV_NAME_CONVENTIONS).reduce((n, [k, val]) => {
@@ -31,7 +31,7 @@ const matchEnv = (NODE_ENV) => {
             /** @type {Array<string>} */
             let _val = val
             // @ts-ignore
-            if (_val.filter((x) => x === NODE_ENV).length) n = k
+            if (_val.filter((x) => x === _NODE_ENV).length) n = k
         }
         return n
     }, '')
@@ -51,15 +51,15 @@ const configParse = function (auto = true, pth = '', loadConfigFile=false) {
 
     /** @type {ENVIRONMENT} */
     // @ts-ignore
-    const NODE_ENV = process.env.NODE_ENV
+    let _NODE_ENV = processNODE_ENV()
 
     let envPath = pth
     if (auto) {
-        if (!NODE_ENV) throw 'NODE_ENV NOT SET'
+        if (!_NODE_ENV) throw 'NODE_ENV NOT SET'
 
-        if (matchEnv(NODE_ENV) === 'DEVELOPMENT') envPath = `./dev.env`
-        if (matchEnv(NODE_ENV) === 'PRODUCTION') envPath = `./prod.env`
-        if (matchEnv(NODE_ENV) === 'TEST') envPath = `./test.env`
+        if (matchEnv(_NODE_ENV) === 'DEVELOPMENT') envPath = `./dev.env`
+        if (matchEnv(_NODE_ENV) === 'PRODUCTION') envPath = `./prod.env`
+        if (matchEnv(_NODE_ENV) === 'TEST') envPath = `./test.env`
     }
 
     try {

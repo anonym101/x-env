@@ -1,7 +1,14 @@
 /** Internal utility belt */
 const path  = require('path')
-const os = require('os')
 const fs = require('fs') 
+
+const processNODE_ENV= ()=>{
+    try{
+        return process.env.NODE_ENV
+    }catch(err){
+        return undefined
+    }
+}
 
 /**
 * @typedef {import('../types').xenv.ENV} ENV
@@ -108,15 +115,16 @@ function xConfigSupportFile(envPath = 'xenv.config.js') {
 /**
 * Parse NODE_ENV value from process.args[0]
 * @param {Array<string> } args 
-* @returns {boolean}
+* @returns {string}
 */
 const simpleParse = (args) => {
-    const NODE_ENV = processArgs(args).NODE_ENV
-    if (!NODE_ENV) return undefined
+    let assignment=''
+    const _NODE_ENV = processArgs(args).NODE_ENV
+    if (!_NODE_ENV) return undefined
     else {
-        process.env.NODE_ENV = NODE_ENV
+        // fixes left-hand assignment issue with webpack
+        return assignment = process.env.NODE_ENV = _NODE_ENV
     }
-    return true
 }
 
 /**
@@ -147,7 +155,7 @@ const combinedENVS = (_configParse) => {
             const loadConfigFile = true
             let v = {
                 ..._configParse(true,null,loadConfigFile), 
-                ...(process.env.NODE_ENV ? { NODE_ENV: process.env.NODE_ENV } : {})
+                ...(processNODE_ENV() ? { NODE_ENV: processNODE_ENV()} : {})
             }
             return v
         }
@@ -161,3 +169,4 @@ exports.combinedENVS = combinedENVS
 exports.envsOneLevelStandard = envsOneLevelStandard
 exports.strignifyObjectValues = strignifyObjectValues
 exports.updateProcessEnvs = updateProcessEnvs
+exports.processNODE_ENV = processNODE_ENV
