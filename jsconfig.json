@@ -21,6 +21,6 @@
   "paths": {
     "*": ["node_modules/*"]
   },
-  "include": ["index","xenv"],
+  "include": ["index","xenv", "x-config"],
   "exclude": ["node_modules","proto","ENVS"]
 }

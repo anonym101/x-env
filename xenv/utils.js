@@ -59,6 +59,9 @@ function envsOneLevelStandard(envs) {
     }
 }
 
+
+
+
 /**
  * Resolve Xenv cognitional/optional callback file  
  * @param {string} envPath 
@@ -80,7 +83,8 @@ function xConfigSupportFile(envPath = 'xenv.config.js') {
         let file = path.resolve(process.cwd(), envPath).replace(/\\/g,"/")
         // first check if we have xenv.config.js available at the project root
         if(!testConfig(file)) return undefined
-        const cb = require(`${file}`)
+      
+        const cb =  require('x-config')(`${file}`) //require(`${file}`)
 
         if (typeof cb === 'function') return cb
         else throw (' Your xenv.config.js must return callback')

@@ -16,7 +16,6 @@ const ENV_NAME_CONVENTIONS = {
     TEST: ['TEST', 'test', 'TESTING', 'testing'],
 }
 
-
 /**
 *
 * Match to current NODE_ENV/ENVIRONMENT by comparison 
