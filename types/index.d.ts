@@ -3,7 +3,10 @@ declare namespace xenv {
     export type ENVIRONMENT = 'TEST' | 'DEVELOPMENT' | 'PRODUCTION'
     export type ENV  = {[prop: string]: string}
     export type NAME_CONVENTIONS = {[name:string]:Array<string> }
-    export type _configParse = function(auto?:boolean, pth?:string,loadConfigFile?:boolean):ENV
+    export interface _configParse{
+        (auto?:boolean, pth?:string,loadConfigFile?:boolean):ENV
+    }
+
     /**
         * Return parsed ENVIRONMENT {name.env} based on process.env.NODE_ENV
         * - NODE_ENV available values matching ENV_NAME_CONVENTIONS[]
