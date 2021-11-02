@@ -18,8 +18,7 @@
   "dependencies": {
     "cross-env": "=7.0.3",
     "dotenv": "=10.0.0",
-    "dotenv-expand": "=5.1.0",
-    "x-config": "file:./x-config"
+    "dotenv-expand": "=5.1.0"
   },
   "bin": {
     "xenv": "./bin/x-env.js"
