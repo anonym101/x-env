@@ -138,13 +138,15 @@ const updateProcessEnvs = (envs)=>{
 
 /**
  *  simpleParse > configParse() +{NODE_ENV}
+ * @param {import("../types").xenv._configParse} _configParse
  * @returns {{}}
  */
 const combinedENVS = (_configParse) => {
     try {
         if (simpleParse(process.argv)) {
+            const loadConfigFile = true
             let v = {
-                ..._configParse(),
+                ..._configParse(true,null,loadConfigFile), 
                 ...(process.env.NODE_ENV ? { NODE_ENV: process.env.NODE_ENV } : {})
             }
             return v

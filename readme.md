@@ -64,9 +64,10 @@ console.log(configParse())
 
 // Or each manually, overrides current process.env.NODE_ENV selection
 const auto = false
-console.log(configParse(auto,'./dev.env')) // parse dev.env values to process.env{...}
-console.log(configParse(auto,'./prod.env')) // parse prod.env values to process.env{...}
-console.log(configParse(auto,'./test.env')) // parse prod.test values to process.env{...}
+const loadConfigFile = true
+console.log(configParse(auto,'./dev.env',loadConfigFile)) // parse dev.env values to process.env{...}
+console.log(configParse(auto,'./prod.env',loadConfigFile)) // parse prod.env values to process.env{...}
+console.log(configParse(auto,'./test.env',loadConfigFile)) // parse prod.test values to process.env{...}
 ```
 
 

@@ -3,7 +3,7 @@
  * @returns {any} module.require output or undefined
  * @notes providing custom require resolves error messages from angular compilation, example: `index.d.ts is missing from the TypeScript compilation. Please make sure it is in your tsconfig via the 'files' `
  */
-module.exports = function modRequire(path = '') {
+module.exports = function modRequire(path = './xenv.config.js') {
 
     const Mod = function () { }
     Mod.prototype = Object.create(module.constructor.prototype)

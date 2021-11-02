@@ -43,10 +43,10 @@ const matchEnv = (NODE_ENV) => {
  * - NODE_ENV available values matching ENV_NAME_CONVENTIONS[]
  * @param {boolean?} auto decide which file to load based on process.env.NODE_ENV
  * @param {string?} pth Optionally provide relative path to your {name}.env 
- * 
+ * @param {boolean?} loadConfigFile to load xenv.config.js file from application root if available
  * @returns {ENV}
  */
-const configParse = function (auto = true, pth = '') {
+const configParse = function (auto = true, pth = '', loadConfigFile=false) {
     if (!auto && !pth) throw 'When auto not set must provide path'
 
     /** @type {ENVIRONMENT} */
@@ -66,26 +66,26 @@ const configParse = function (auto = true, pth = '') {
         let data = dotEnvConfig({ path: envPath })
 
         // add xenv.config.js (optional) support so we can make conditional updates based on our {name}.env configuration
-        const configSupportCB = xConfigSupportFile('xenv.config.js')
+        if (loadConfigFile) {
+            const configSupportCB = xConfigSupportFile('xenv.config.js')
+            if (configSupportCB) {
+                let updatedEnvs = configSupportCB(Object.assign({}, data.parsed)) || {}
 
-        if (configSupportCB) {
-            let updatedEnvs = configSupportCB(Object.assign({},data.parsed)) || {}
+                if (!envsOneLevelStandard(updatedEnvs)) {
+                    updatedEnvs = {}
+                    console.error('process.env configuration return for xenv.config.js must be 1 level object/standard')
+                }
 
-            if (!envsOneLevelStandard(updatedEnvs)) {
-                updatedEnvs = {}
-                console.error('process.env configuration return for xenv.config.js must be 1 level object/standard')
+                const clean_updatedEnvs = strignifyObjectValues(updatedEnvs)
+                data.parsed = {
+                    ...data.parsed,
+                    ...clean_updatedEnvs
+                }
+
+                if (Object.keys(clean_updatedEnvs).length) updateProcessEnvs(data.parsed)
             }
-            
-           const clean_updatedEnvs = strignifyObjectValues(updatedEnvs)
-            data.parsed={
-                ...data.parsed,
-                ...clean_updatedEnvs
-            }
-
-           if(Object.keys(clean_updatedEnvs).length) updateProcessEnvs(data.parsed)
-         
         }
-
+        
         const d = variableExpansion(data) // update value prefixes, (example): localhost:${PORT} > localhost:5555
         if (d.error) throw d.error
         else return d.parsed
