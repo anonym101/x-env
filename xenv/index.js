@@ -62,21 +62,34 @@ const configParse = function (auto = true, pth = '', loadConfigFile=false) {
         if (matchEnv(_NODE_ENV) === 'TEST') envPath = `./test.env`
     }
 
+    /** execute config file if provided, catch any callback errors as well */
+    const execute_config_cb = (parsedData)=>{
+        try{
+            const configSupportCB = xConfigSupportFile('xenv.config.js')
+            if(configSupportCB){
+               return configSupportCB(Object.assign({}, parsedData)) || {}
+            }
+            
+        }catch(err){
+            console.error('[xenv][config]',err)
+        }
+        return undefined
+    }
+
     try {
         let data = dotEnvConfig({ path: envPath })
 
         // add xenv.config.js (optional) support so we can make conditional updates based on our {name}.env configuration
         if (loadConfigFile) {
-            const configSupportCB = xConfigSupportFile('xenv.config.js')
-            if (configSupportCB) {
-                let updatedEnvs = configSupportCB(Object.assign({}, data.parsed)) || {}
 
-                if (!envsOneLevelStandard(updatedEnvs)) {
-                    updatedEnvs = {}
+            let availableData = execute_config_cb(data.parsed) 
+            if (availableData) {
+                if (!envsOneLevelStandard(availableData)) {
+                    availableData = {}
                     console.error('process.env configuration return for xenv.config.js must be 1 level object/standard')
                 }
 
-                const clean_updatedEnvs = strignifyObjectValues(updatedEnvs)
+                const clean_updatedEnvs = strignifyObjectValues(availableData)
                 data.parsed = {
                     ...data.parsed,
                     ...clean_updatedEnvs
