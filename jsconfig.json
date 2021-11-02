@@ -19,7 +19,8 @@
     "baseUrl": "."
   },
   "paths": {
-    "*": ["node_modules/*"]
+    "*": ["node_modules/*"],
+    "x-config":["./x-config"]
   },
   "include": ["index","xenv", "x-config"],
   "exclude": ["node_modules","proto","ENVS"]

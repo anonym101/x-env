@@ -84,7 +84,7 @@ function xConfigSupportFile(envPath = 'xenv.config.js') {
         // first check if we have xenv.config.js available at the project root
         if(!testConfig(file)) return undefined
       
-        const cb =  require('x-config')(`${file}`) //require(`${file}`)
+        const cb =  require('../x-config')(`${file}`) //require(`${file}`)
 
         if (typeof cb === 'function') return cb
         else throw (' Your xenv.config.js must return callback')
