@@ -7,7 +7,8 @@
 
 const dotEnvConfig = require('dotenv').config
 const variableExpansion = require('dotenv-expand')
-const {xConfigSupportFile,envsOneLevelStandard,strignifyObjectValues,updateProcessEnvs,processNODE_ENV} = require('./utils')
+const {envsOneLevelStandard,strignifyObjectValues,updateProcessEnvs,processNODE_ENV} = require('./utils')
+const scriptLoader = require('../x-config')
 
 /** @type {NAME_CONVENTIONS} */
 const ENV_NAME_CONVENTIONS = {
@@ -60,18 +61,20 @@ const configParse = function (auto = true, pth = '', loadConfigFile=false) {
         if (matchEnv(_NODE_ENV) === 'DEVELOPMENT') envPath = `./dev.env`
         if (matchEnv(_NODE_ENV) === 'PRODUCTION') envPath = `./prod.env`
         if (matchEnv(_NODE_ENV) === 'TEST') envPath = `./test.env`
+
     }
 
     /** execute config file if provided, catch any callback errors as well */
     const execute_config_cb = (parsedData)=>{
         try{
-            const configSupportCB = xConfigSupportFile('xenv.config.js')
-            if(configSupportCB){
-               return configSupportCB(Object.assign({}, parsedData)) || {}
-            }
+
+            const configSupportCB = scriptLoader('xenv.config.js')
+            if(configSupportCB) return configSupportCB(Object.assign({}, parsedData)) || {}
             
         }catch(err){
+
             console.error('[xenv][config]',err)
+
         }
         return undefined
     }

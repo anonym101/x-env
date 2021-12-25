@@ -70,49 +70,6 @@ function envsOneLevelStandard(envs) {
 
 
 /**
- * Resolve Xenv cognitional/optional callback file  
- * @param {string} envPath 
- * @returns {(env:ENV | any)=>ENV?} return updated env 
- */
-function xConfigSupportFile(envPath = 'xenv.config.js') {
-    if (!envPath) throw 'fileName not set?'
-
-    const testConfig = (file='')=>{
-        try{
-            return fs.readFileSync(file).toString().length >0
-        }catch(err){
-            return false
-        }
-    }
-
-    // try 2 chances
-    try {
-        let file = path.resolve(process.cwd(), envPath).replace(/\\/g,"/")
-        // first check if we have xenv.config.js available at the project root
-        if(!testConfig(file)) return undefined
-      
-        const cb =  require('../x-config')(`${file}`) //require(`${file}`)
-
-        if (typeof cb === 'function') return cb
-        else throw (' Your xenv.config.js must return callback')
-    } catch (err) {
-        console.error('[xenv][config]', err)
-    }
-    // try {
-    //     let file = (envPath || '')[0] === '~' ? path.join(os.homedir(), (envPath || '').slice(1)) : envPath || ''
-    //      // first check if we have xenv.config.js available at the project root
-    //     if(!testConfig(file)) return undefined
-    //     const cb = require(file)
-    //     if (typeof cb === 'function') return cb
-    //     else throw (' Your xenv.config.js must return callback')
-    // } catch (err) {
-    //     console.error('[xenv][config]', err)
-    // }
-    return undefined
-}
-
-
-/**
 * Parse NODE_ENV value from process.args[0]
 * @param {Array<string> } args 
 * @returns {boolean}
@@ -166,7 +123,6 @@ const combinedENVS = (_configParse) => {
     }
     return {}
 }
-exports.xConfigSupportFile = xConfigSupportFile
 exports.combinedENVS = combinedENVS
 exports.envsOneLevelStandard = envsOneLevelStandard
 exports.strignifyObjectValues = strignifyObjectValues
